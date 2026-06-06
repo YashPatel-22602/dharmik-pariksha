@@ -1,0 +1,149 @@
+<!-- ================= UPLOAD MARKS TAB ================= -->
+
+<div id="uploadMarksTab" class="tab-content">
+
+  <div class="card">
+
+    <h2>Upload Exam Marks</h2>
+
+    <p class="description">
+      Upload the Excel file containing marks for Level 0, Level 1 and Level 2 exams.
+    </p>
+
+    <form id="marksUploadForm">
+
+      <div class="upload-box">
+
+        <input 
+        type="file" 
+        id="marksFile"
+        name="file"
+        accept=".xlsx,.xls"
+        required
+        />
+
+      </div>
+
+      <button type="submit" class="upload-btn">
+        Upload Marks
+      </button>
+
+    </form>
+
+    <p id="marksUploadMessage" class="message"></p>
+
+  </div>
+
+</div>
+
+<style>
+
+.tab-content{
+padding:30px;
+}
+
+.card{
+background:white;
+border-radius:12px;
+padding:30px;
+box-shadow:0 4px 15px rgba(0,0,0,0.08);
+max-width:600px;
+}
+
+.card h2{
+margin-bottom:10px;
+color:#222;
+}
+
+.description{
+color:#666;
+margin-bottom:20px;
+}
+
+.upload-box{
+border:2px dashed #ddd;
+padding:30px;
+text-align:center;
+border-radius:10px;
+margin-bottom:20px;
+background:#fafafa;
+}
+
+.upload-box input{
+font-size:16px;
+}
+
+.upload-btn{
+background:#2c7be5;
+color:white;
+border:none;
+padding:12px 25px;
+font-size:16px;
+border-radius:6px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.upload-btn:hover{
+background:#1a68d1;
+}
+
+.message{
+margin-top:15px;
+font-weight:600;
+color:green;
+}
+
+</style>
+
+<script>
+
+document
+.getElementById("marksUploadForm")
+.addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const fileInput = document.getElementById("marksFile");
+
+const file = fileInput.files[0];
+
+if(!file){
+
+alert("Please select a file");
+
+return;
+
+}
+
+const formData = new FormData();
+
+formData.append("file", file);
+
+document.getElementById("marksUploadMessage").innerText="Uploading...";
+
+try{
+
+const response = await fetch("/api/admin/upload-marks",{
+
+method:"POST",
+
+body:formData
+
+});
+
+const data = await response.json();
+
+document.getElementById("marksUploadMessage").innerText=data.message;
+
+}catch(error){
+
+document.getElementById("marksUploadMessage").innerText="Upload Failed";
+
+console.error(error);
+
+}
+
+});
+
+</script>
