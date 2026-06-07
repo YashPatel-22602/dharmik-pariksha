@@ -66,7 +66,7 @@ const results = rows.map(row => ({
 lndId: row.LNDID,
 name: row.Name,
 
-examLevel: Number(row.Level),
+examLevel: String (row.Level),
 examYear: Number(row.Year),
 
 marks: Number(row.Marks),
@@ -75,7 +75,12 @@ submittedAt: new Date(row.SubmittedAt)
 
 }));
 
-await Result.insertMany(results);
+await Result.insertMany(
+  results,
+  {
+    ordered: false
+  }
+);
 
 res.json({
 message: "Marks uploaded successfully"
@@ -264,5 +269,75 @@ exports.downloadUserRegForExam = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error generating zip" });
+  }
+};
+
+exports.getAnalytics = async (req, res) => {
+  try {
+
+    const totalUsers = await User.countDocuments();
+
+    const totalRegistrations =
+      await ExamRegistered.countDocuments();
+
+    const totalResults =
+      await Result.countDocuments();
+
+    const avgResult = await Result.aggregate([
+      {
+        $group: {
+          _id: null,
+          avgMarks: {
+            $avg: "$marks"
+          }
+        }
+      }
+    ]);
+
+    const levelWise = await Result.aggregate([
+      {
+        $group: {
+          _id: "$examLevel",
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]);
+
+    const yearWise = await Result.aggregate([
+      {
+        $group: {
+          _id: "$examYear",
+          count: {
+            $sum: 1
+          }
+        }
+      },
+      {
+        $sort: {
+          _id: 1
+        }
+      }
+    ]);
+
+    res.json({
+      totalUsers,
+      totalRegistrations,
+      totalResults,
+      avgMarks:
+        avgResult[0]?.avgMarks?.toFixed(2) || 0,
+      levelWise,
+      yearWise
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: "Analytics fetch failed"
+    });
+
   }
 };

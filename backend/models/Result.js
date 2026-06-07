@@ -11,7 +11,7 @@ index: true
 name: String,
 
 examLevel: {
-type: Number,
+type: String,
 required: true
 },
 
@@ -21,7 +21,7 @@ required: true
 },
 
 marks: {
-type: Number,
+type: String,
 required: true
 },
 
@@ -31,6 +31,16 @@ required: true
 }
 },
 { timestamps: true }
+);
+
+resultSchema.index(
+ {
+   lndId: 1,
+   examYear: 1
+ },
+ {
+   unique: true
+ }
 );
 
 module.exports = mongoose.model("Result", resultSchema);

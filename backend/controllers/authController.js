@@ -23,7 +23,20 @@ const registerUser = async (req, res) => {
     }
 
     const centerCode = examCenterCodes[centerKey];
-    const lndId = await generateLndId(centerCode);
+    const lndId = (await generateLndId(centerCode)).toUpperCase();
+    const existingUser = await User.findOne({
+        name,
+      mobileNumber
+    });
+
+    if (existingUser) {
+
+      return res.status(400).json({
+        message:
+          "User already registered"
+      });
+
+}
 
     await User.create({
       lndId,
@@ -71,7 +84,12 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ lndId, role: loginType });
+    const normalizedLndId = lndId.trim().toUpperCase();
+
+    const user = await User.findOne({
+      lndId: normalizedLndId,
+      role: loginType
+    });
 
     if (!user) {
       return res.status(401).json({

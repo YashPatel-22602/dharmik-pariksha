@@ -26,4 +26,19 @@ registrationSchema.index(
   { unique: true }
 );
 
+registrationSchema.index({
+  lndId: 1,
+  year: 1
+});
+
+registrationSchema.index(
+  {
+     lndId: 1,
+     year: 1
+  },
+  {
+     unique: true
+  }
+);
+
 module.exports = mongoose.model("Registration", registrationSchema);

@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("legacy");
   const [message, setMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [analytics, setAnalytics] = useState(null);
 
+  useEffect(() => {
+
+  if (activeTab === "analytics") {
+    fetchAnalytics();
+  }
+
+}, [activeTab]);
   // ---------------- Upload Legacy Users ----------------
   const handleLegacyUpload = async (e) => {
     e.preventDefault();
@@ -120,6 +130,35 @@ const downloadZip1 = async () => {
     }
   };
 
+  const fetchAnalytics = async () => {
+
+  try {
+
+    const res = await fetch(
+      "http://localhost:5000/api/admin/analytics",
+      {
+        headers: {
+          Authorization:
+            `Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    setAnalytics(data);
+
+  } catch (err) {
+
+    console.error(
+      "Analytics Error",
+      err
+    );
+
+  }
+
+};
+
   return (
 
     <div style={styles.container}>
@@ -149,6 +188,13 @@ const downloadZip1 = async () => {
 
   <button onClick={downloadZip1} style={styles.menuBtn}>
     Exam Registrations User ZIP
+  </button>
+
+  <button
+  style={styles.menuBtn}
+  onClick={() => setActiveTab("analytics")}
+>
+  Analytics
   </button>
 </div>
       {/* Content */}
@@ -256,10 +302,98 @@ onClick={async () => {
   </div>
 )}
 
-        {/* -------- Message -------- */}
-        {message && (
-          <p style={styles.message}>{message}</p>
-        )}
+{activeTab === "analytics" && analytics && (
+
+<div style={{ width: "100%" }}>
+
+<h2>Analytics Dashboard</h2>
+
+<div
+style={{
+display:"grid",
+gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",
+gap:"20px",
+marginBottom:"30px"
+}}
+>
+
+<div style={styles.analyticsCard}>
+<h3>Total Users</h3>
+<h1>{analytics.totalUsers}</h1>
+</div>
+
+<div style={styles.analyticsCard}>
+<h3>Total Registrations</h3>
+<h1>{analytics.totalRegistrations}</h1>
+</div>
+
+<div style={styles.analyticsCard}>
+<h3>Total Results</h3>
+<h1>{analytics.totalResults}</h1>
+</div>
+
+<div style={styles.analyticsCard}>
+<h3>Average Marks</h3>
+<h1>{analytics.avgMarks}</h1>
+</div>
+
+</div>
+
+<div style={styles.card}>
+<h3>Level Wise Distribution</h3>
+
+<table style={{ width:"100%" }}>
+<thead>
+<tr>
+<th>Level</th>
+<th>Count</th>
+</tr>
+</thead>
+
+<tbody>
+{analytics.levelWise.map(item => (
+<tr key={item._id}>
+<td>{item._id}</td>
+<td>{item.count}</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+
+<br />
+
+<div style={styles.card}>
+<h3>Year Wise Results</h3>
+
+<table style={{ width:"100%" }}>
+<thead>
+<tr>
+<th>Year</th>
+<th>Count</th>
+</tr>
+</thead>
+
+<tbody>
+{analytics.yearWise.map(item => (
+<tr key={item._id}>
+<td>{item._id}</td>
+<td>{item.count}</td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+
+</div>
+
+)}
+
+{/* -------- Message -------- */}
+{message && (
+  <p style={styles.message}>{message}</p>
+)}
+
       </div>
     </div>
   );
@@ -337,6 +471,14 @@ const styles = {
     fontWeight: "bold",
     color: "green",
   },
+
+  analyticsCard: {
+  background: "white",
+  padding: "20px",
+  borderRadius: "10px",
+  textAlign: "center",
+  boxShadow: "0 5px 15px rgba(0,0,0,0.1)"
+},
 };
 
 export default AdminDashboard;

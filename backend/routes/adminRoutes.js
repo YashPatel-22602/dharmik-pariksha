@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const adminMiddleware = require("../middleware/adminMiddleware");
 const { uploadLegacyUsers, uploadMarks } = require("../controllers/adminController");
-
+const authMiddleware = require("../middleware/authMiddleware")
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 
@@ -24,6 +24,17 @@ const {
 router.post("/toggle-registration", adminMiddleware, toggleRegistration);
 router.post("/toggle-registration", toggleRegistration);
 router.get("/registration-status", getRegistrationStatus);
+
+const {
+  getAnalytics
+} = require("../controllers/adminController");
+
+router.get(
+  "/analytics",
+  authMiddleware,
+  adminMiddleware,
+  getAnalytics
+);
 
 module.exports = router;
 

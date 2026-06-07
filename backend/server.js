@@ -4,7 +4,8 @@ const marksRoutes = require("./routes/marksRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const resultRoutes = require("./routes/resultRoutes");
 const registrationRoutes = require("./routes/registrationRoutes");
-
+const certificateRoutes =
+require("./routes/certificateRoutes");
 
 require("dotenv").config();
 
@@ -35,6 +36,10 @@ app.use("/api/admin", marksRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/results", resultRoutes);
 app.use("/api/registration", registrationRoutes);
+app.use(
+  "/api/certificate",
+  certificateRoutes
+);
 
 // Start server LAST
 const PORT = process.env.PORT || 5000;

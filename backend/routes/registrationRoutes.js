@@ -98,6 +98,8 @@ router.post("/register", authMiddleware, async (req, res) => {
       });
     }
 
+
+
     // ❌ STEP 3: prevent duplicate (same user)
 const registration = await Registration.findOne({
   user: req.user._id,
@@ -141,5 +143,91 @@ const registration = await Registration.findOne({
   }
 });
 
+const Result = require("../models/Result");
+
+router.get(
+  "/available-levels",
+  authMiddleware,
+  async (req, res) => {
+
+    try {
+
+      const latestResult =
+        await Result.findOne({
+          lndId: req.user.lndId
+        }).sort({ examYear: -1 });
+
+      console.log("LATEST RESULT:", latestResult);
+
+      let levels = [];
+
+      // NEW USER
+      if (!latestResult) {
+
+        levels = [
+          "Basic",
+          "Level 1",
+          "Level 2"
+        ];
+      }
+
+      // Basic Passed
+      else if (
+        latestResult.examLevel === "Basic"
+      ) {
+
+        levels = ["Level 1"];
+      }
+
+      // Level 1 Passed
+      else if (
+        latestResult.examLevel === "1"
+      ) {
+
+        levels = ["Level 2"];
+      }
+
+      // Level 2 Passed
+      else if (
+        latestResult.examLevel === "2"
+      ) {
+
+        levels = ["Level 3"];
+      }
+
+      // Level 3 Passed
+      else if (
+        latestResult.examLevel === "3"
+      ) {
+
+        levels = ["Level 3"];
+      }
+
+      else {
+
+        levels = [
+          "Basic",
+          "Level 1",
+          "Level 2"
+        ];
+      }
+
+      res.json({
+        success: true,
+        levels
+      });
+
+    } catch (err) {
+
+      console.error(err);
+
+      res.status(500).json({
+        message: "Server Error"
+      });
+
+    }
+
+  }
+);
 
 module.exports = router;

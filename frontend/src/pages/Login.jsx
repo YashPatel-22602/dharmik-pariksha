@@ -40,8 +40,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
 
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Dharmik Pariksha Portal
+        <h1 className="text-4xl font-extrabold text-center mb-6 text-indigo-700 tracking-wide">
+        Satsang Gnan Pariksha
         </h1>
 
         <div className="flex mb-6">
@@ -104,7 +104,7 @@ export default function Login() {
 
         {activeTab === "user" && (
   <p className="text-center mt-4 text-sm">
-    Don’t have an account?{" "}
+    For New User Registration Click Here ---{'>'} {" "}
     <span
       onClick={() => navigate("/register")}
       className="text-indigo-600 cursor-pointer font-semibold hover:underline"

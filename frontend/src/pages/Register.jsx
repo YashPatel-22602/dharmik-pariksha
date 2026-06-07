@@ -251,6 +251,9 @@ const centerName = selectedCenter
               Mobile Number *
             </label>
             <input
+              type="text"
+              maxLength={10}
+              pattern="[0-9]{10}"
               name="mobileNumber"
               onChange={handleChange}
               className="premium-input"

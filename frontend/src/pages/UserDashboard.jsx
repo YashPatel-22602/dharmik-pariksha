@@ -2,19 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import API from "../services/api";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line
-} from "recharts";
+
 
 export default function UserDashboard() {
 
@@ -32,9 +20,10 @@ const [levelData,setLevelData] = useState([]);
 const [genderData,setGenderData] = useState([]);
 const [yearData,setYearData] = useState([]);
 const [sidebarOpen, setSidebarOpen] = useState(false);
-
+const [availableLevels, setAvailableLevels] = useState([]);
 const [loading,setLoading] = useState(true);
 const [error,setError] = useState("");
+const [certificates,setCertificates] =useState([]);
 
 const [theme,setTheme] = useState(() => {
 const saved = localStorage.getItem("theme");
@@ -69,31 +58,32 @@ try{
 setLoading(true);
 setError("");
 
-const [u,r,l,g,y,check] = await Promise.all([
-  API.get("/auth/me"),
-  API.get("/results/my"),
-  API.get("/dashboard/levels"),
-  API.get("/dashboard/gender"),
-  API.get("/dashboard/registrations"),
+const [u, r, check, levels,certs] =
+  await Promise.all([
+    API.get("/auth/me"),
+    API.get("/results/my"),
+    API.get("/registration/check"),
+    API.get("/registration/available-levels"),
+    API.get("/results/certificate-years")
 
-  API.get("/registration/check")     // ✅ ADD
-]);
-
+  ]);
 setProfile(u.data);
 setResults(r.data || []);
-setLevelData(l.data || []);
-setGenderData(g.data || []);
-setYearData(y.data || []);
 setRegistrationOpen(check.data?.isOpen || false);
 setAlreadyRegistered(check.data?.registered || false);
 setRegisteredLevel(check.data?.level || null);
+setAvailableLevels(levels.data.levels || []);
+setCertificates(certs.data || []);
 
-console.log("LEVEL DATA", l.data);
-console.log("GENDER DATA", g.data);
-console.log("YEAR DATA", y.data);
-console.log("RESULTS DATA", r.data);
+const fetchedLevels = levels.data.levels || [];
 
-console.log("CHECK API RESPONSE:", check.data);
+setAvailableLevels(fetchedLevels);
+
+if (fetchedLevels.length > 0) {
+  setLevel(fetchedLevels[0]);
+}
+
+
 }catch (err) {
   console.error("CHECK API ERROR:", err.response?.data || err.message);
   setError("Failed to load dashboard data.");
@@ -101,6 +91,42 @@ console.log("CHECK API RESPONSE:", check.data);
 finally{
 setLoading(false);
 }
+
+};
+
+const downloadCertificate = async (year) => {
+
+  try {
+
+    const response = await API.get(
+      `/certificate/${year}`,
+      {
+        responseType: "blob"
+      }
+    );
+
+    const url = window.URL.createObjectURL(
+      new Blob([response.data])
+    );
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `Certificate-${year}.pdf`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Certificate download failed");
+
+  }
 
 };
 
@@ -222,25 +248,31 @@ return(
 <div className="hidden lg:flex w-64 bg-white/70 dark:bg-gray-800 backdrop-blur-xl shadow-2xl p-6 flex-col justify-between">
 
   <div>
+
     <h2 className="text-2xl font-bold text-indigo-600 dark:text-white mb-10">
       Dashboard
     </h2>
 
     <nav className="flex flex-col gap-4">
-      {["overview","analytics","profile","registration"].map(tab => (
+
+      {["overview","profile","exam registration","certificates"].map(tab => (
+
         <button
           key={tab}
           onClick={() => setActiveTab(tab)}
-          className={`px-4 py-2 rounded-xl capitalize ${
+          className={`px-4 py-3 rounded-xl capitalize transition ${
             activeTab === tab
               ? "bg-indigo-600 text-white"
-              : "text-gray-600 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-gray-700"
+              : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           }`}
         >
           {tab}
         </button>
+
       ))}
+
     </nav>
+
   </div>
 
   <button
@@ -251,7 +283,6 @@ return(
   </button>
 
 </div>
-
 
 {/* ✅ MOBILE SIDEBAR */}
 {sidebarOpen && (
@@ -271,7 +302,7 @@ return(
       </h2>
 
       <nav className="flex flex-col gap-4">
-        {["overview","analytics","profile","registration"].map(tab => (
+        {["overview","profile","registration","certificates"].map(tab => (
           <button
             key={tab}
             onClick={() => {
@@ -314,7 +345,6 @@ return(
   >
     ☰
   </button>
-
   <div>
     <h1 className="text-3xl font-bold dark:text-white">
       Welcome, {profile?.name || "User"} 👋
@@ -378,16 +408,6 @@ Year {bestExam.examYear || bestExam.year} — Level {bestExam.examLevel || bestE
 📊 Score Progress
 </h2>
 
-<ResponsiveContainer width="100%" height={300}>
-
-<LineChart data={progressData}>
-<XAxis dataKey="year"/>
-<YAxis/>
-<Tooltip/>
-<Line type="monotone" dataKey="marks" stroke="#6366f1" strokeWidth={3}/>
-</LineChart>
-
-</ResponsiveContainer>
 
 </div>
 
@@ -440,67 +460,7 @@ Exam {index+1}
 
 )}
 
-{/* ================= ANALYTICS ================= */}
 
-{activeTab==="analytics" && (
-
-<div className="grid md:grid-cols-2 gap-10">
-
-<div className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl">
-
-<h2 className="text-lg font-semibold mb-6 dark:text-white">
-🎯 Level Distribution
-</h2>
-
-<ResponsiveContainer width="100%" height={300}>
-
-<BarChart data={levelData}>
-<XAxis dataKey="_id"/>
-<YAxis/>
-<Tooltip/>
-<Bar dataKey="count" fill="#6366f1"/>
-</BarChart>
-
-</ResponsiveContainer>
-
-</div>
-
-<div className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl">
-
-<h2 className="text-lg font-semibold mb-6 dark:text-white">
-👥 Gender Ratio
-</h2>
-
-<ResponsiveContainer width="100%" height={300}>
-
-<PieChart>
-
-<Pie
-data={genderData}
-dataKey="count"
-nameKey="_id"
-outerRadius={100}
-innerRadius={50}
-label
->
-
-{genderData.map((_,i)=>(
-<Cell key={i} fill={i%2===0?"#6366f1":"#ec4899"}/>
-))}
-
-</Pie>
-
-<Tooltip/>
-
-</PieChart>
-
-</ResponsiveContainer>
-
-</div>
-
-</div>
-
-)}
 
 {/* ================= PROFILE ================= */}
 
@@ -526,12 +486,12 @@ Profile Information
 
 {/* ================= EXAM REGISTRATION ================= */}
 
-{activeTab==="registration" && (
+{activeTab==="exam registration" && (
 
 <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl max-w-xl">
 
 <h2 className="text-xl font-semibold mb-6 dark:text-white">
-Exam Registration
+  Exam Registration
 </h2>
 
 {!registrationOpen ? (
@@ -563,9 +523,16 @@ Exam Registration
   value={level}
   onChange={(e)=>setLevel(e.target.value)}
 >
-<option value="Level 0">Level 0</option>
-<option value="Level 1">Level 1</option>
-<option value="Level 2">Level 2</option>
+{
+  availableLevels.map((lvl) => (
+    <option
+      key={lvl}
+      value={lvl}
+    >
+      {lvl}
+    </option>
+  ))
+}
 </select>
 
 <div className="flex items-center gap-2">
@@ -588,6 +555,68 @@ onChange={(e)=>setWantExam(e.target.checked)}
 </div>
 
 )}
+
+</div>
+
+)}
+
+{activeTab==="certificates" && (
+
+<div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl">
+
+<h2 className="text-xl font-semibold mb-6 dark:text-white">
+
+📜 Certificates
+
+</h2>
+
+<div className="space-y-4">
+
+{certificates.map((cert)=>(
+
+<div
+key={cert.examYear}
+className="flex justify-between items-center p-4 border rounded-xl"
+>
+
+<div>
+
+<p>
+
+<strong>Year:</strong>
+
+{cert.examYear}
+
+</p>
+
+<p>
+
+<strong>Level:</strong>
+
+{cert.examLevel}
+
+</p>
+
+</div>
+
+<button
+
+onClick={() =>
+downloadCertificate(cert.examYear)
+}
+
+className="bg-green-600 text-white px-4 py-2 rounded-lg"
+>
+
+Download
+
+</button>
+
+</div>
+
+))}
+
+</div>
 
 </div>
 
