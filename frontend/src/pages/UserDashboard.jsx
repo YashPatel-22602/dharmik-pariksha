@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import API from "../services/api";
-
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip
+} from "recharts";
 
 export default function UserDashboard() {
 
@@ -302,7 +310,7 @@ return(
       </h2>
 
       <nav className="flex flex-col gap-4">
-        {["overview","profile","registration","certificates"].map(tab => (
+        {["overview","profile","exam registration","certificates"].map(tab => (
           <button
             key={tab}
             onClick={() => {
@@ -400,14 +408,103 @@ Year {bestExam.examYear || bestExam.year} — Level {bestExam.examLevel || bestE
 
 )}
 
-{/* GRAPH */}
+{/* SCORE PROGRESS */}
 
 <div className="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl">
 
-<h2 className="text-lg font-semibold mb-6 dark:text-white">
-📊 Score Progress
-</h2>
+  <div className="flex justify-between items-center mb-6">
 
+    <div>
+
+      <h2 className="text-2xl font-bold dark:text-white">
+        📈 Score Progress
+      </h2>
+
+      <p className="text-gray-500 dark:text-gray-400">
+        Track your improvement across exams
+      </p>
+
+    </div>
+
+  </div>
+
+  <div style={{ width: "100%", height: 350 }}>
+
+    <ResponsiveContainer>
+
+      <AreaChart
+        data={progressData}
+        margin={{
+          top: 20,
+          right: 30,
+          left: 0,
+          bottom: 10
+        }}
+      >
+
+        <defs>
+
+          <linearGradient
+            id="scoreGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+
+            <stop
+              offset="5%"
+              stopColor="#6366F1"
+              stopOpacity={0.8}
+            />
+
+            <stop
+              offset="95%"
+              stopColor="#6366F1"
+              stopOpacity={0}
+            />
+
+          </linearGradient>
+
+        </defs>
+
+        <CartesianGrid
+          strokeDasharray="3 3"
+          opacity={0.2}
+        />
+
+        <XAxis
+          dataKey="year"
+          tick={{ fill: "#888" }}
+        />
+
+        <YAxis
+          tick={{ fill: "#888" }}
+        />
+
+        <Tooltip
+          contentStyle={{
+            borderRadius: "12px",
+            border: "none",
+            boxShadow:
+              "0 8px 20px rgba(0,0,0,0.15)"
+          }}
+        />
+
+        <Area
+          type="monotone"
+          dataKey="marks"
+          stroke="#6366F1"
+          strokeWidth={4}
+          fillOpacity={1}
+          fill="url(#scoreGradient)"
+        />
+
+      </AreaChart>
+
+    </ResponsiveContainer>
+
+  </div>
 
 </div>
 

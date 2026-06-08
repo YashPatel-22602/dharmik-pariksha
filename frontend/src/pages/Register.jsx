@@ -26,7 +26,7 @@ export default function Register() {
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
-  doc.text("DHARMIK PARIKSHA", 105, 15, {
+  doc.text("Satsang Gnan Pariksha", 105, 15, {
     align: "center",
   });
 
@@ -182,7 +182,7 @@ const centerName = selectedCenter
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl w-full max-w-3xl p-10 text-white">
 
         <h2 className="text-4xl font-bold text-center mb-8 tracking-wide">
-          Dharmik Pariksha Registration
+          Satsang Gnan Pariksha
         </h2>
 
         {error && (
@@ -241,7 +241,6 @@ const centerName = selectedCenter
               <option value="">Select Gender</option>
               <option>Male</option>
               <option>Female</option>
-              <option>Other</option>
             </select>
           </div>
 

@@ -298,9 +298,7 @@ exports.getAnalytics = async (req, res) => {
       {
         $group: {
           _id: "$examLevel",
-          count: {
-            $sum: 1
-          }
+          count: { $sum: 1 }
         }
       }
     ]);
@@ -309,17 +307,44 @@ exports.getAnalytics = async (req, res) => {
       {
         $group: {
           _id: "$examYear",
-          count: {
-            $sum: 1
-          }
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    // Gender Distribution
+    const genderWise = await User.aggregate([
+      {
+        $group: {
+          _id: "$gender",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Center Wise Registrations
+    const centerWise = await ExamRegistered.aggregate([
+      {
+        $group: {
+          _id: "$center",
+          count: { $sum: 1 }
         }
       },
       {
         $sort: {
-          _id: 1
+          count: -1
         }
       }
     ]);
+
+    // Top 10 Scorers
+    const topScorers = await Result.find()
+      .sort({ marks: -1 })
+      .limit(10)
+      .select("name marks examLevel");
 
     res.json({
       totalUsers,
@@ -328,7 +353,10 @@ exports.getAnalytics = async (req, res) => {
       avgMarks:
         avgResult[0]?.avgMarks?.toFixed(2) || 0,
       levelWise,
-      yearWise
+      yearWise,
+      genderWise,
+      centerWise,
+      topScorers
     });
 
   } catch (err) {

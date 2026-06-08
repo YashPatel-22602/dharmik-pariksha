@@ -1,8 +1,31 @@
 import React, { useState, useEffect } from "react";
-
+import {
+  PieChart,
+  Pie,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Cell,
+  Legend,
+  AreaChart,
+  Area,
+  CartesianGrid
+} from "recharts";
 
 
 const AdminDashboard = () => {
+
+const COLORS = [
+  "#6366F1",
+  "#8B5CF6",
+  "#EC4899",
+  "#F59E0B",
+  "#10B981",
+  "#06B6D4"
+];
   const [activeTab, setActiveTab] = useState("legacy");
   const [message, setMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -302,93 +325,219 @@ onClick={async () => {
   </div>
 )}
 
+
+
+{/* LEVEL WISE PIE CHART */}
 {activeTab === "analytics" && analytics && (
+<>
+<div
+  style={{
+    background:"#fff",
+    borderRadius:"20px",
+    padding:"25px",
+    marginTop:"20px",
+    boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
+  }}
+>
+  <h3>📊 Level Wise Distribution</h3>
 
-<div style={{ width: "100%" }}>
+  <ResponsiveContainer width="100%" height={350}>
+    <PieChart>
+      <Pie
+        data={analytics.levelWise}
+        dataKey="count"
+        nameKey="_id"
+        outerRadius={
+        window.innerWidth < 768 ? 90 : 130
+      }
+      innerRadius={
+        window.innerWidth < 768 ? 45 : 70
+      }
+        paddingAngle={4}
+        label
+      >
+        {analytics.levelWise.map((entry,index)=>(
+          <Cell
+            key={index}
+            fill={COLORS[index % COLORS.length]}
+          />
+        ))}
+      </Pie>
 
-<h2>Analytics Dashboard</h2>
+      <Tooltip />
+      <Legend />
+    </PieChart>
+  </ResponsiveContainer>
+</div>
+
+
+{/* GENDER PIE CHART */}
 
 <div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",
-gap:"20px",
-marginBottom:"30px"
-}}
+  style={{
+    background:"#fff",
+    borderRadius:"20px",
+    padding:"25px",
+    marginTop:"30px",
+    boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
+  }}
 >
+  <h3>👨 Gender Distribution</h3>
 
-<div style={styles.analyticsCard}>
-<h3>Total Users</h3>
-<h1>{analytics.totalUsers}</h1>
+  <ResponsiveContainer width="100%" height={350}>
+    <PieChart>
+      <Pie
+        data={analytics.genderWise}
+        dataKey="count"
+        nameKey="_id"
+        outerRadius={
+  window.innerWidth < 768 ? 90 : 130
+}
+innerRadius={
+  window.innerWidth < 768 ? 45 : 70
+}
+        label
+      >
+        {analytics.genderWise.map((entry,index)=>(
+          <Cell
+            key={index}
+            fill={COLORS[index % COLORS.length]}
+          />
+        ))}
+      </Pie>
+
+      <Tooltip />
+      <Legend />
+    </PieChart>
+  </ResponsiveContainer>
 </div>
 
-<div style={styles.analyticsCard}>
-<h3>Total Registrations</h3>
-<h1>{analytics.totalRegistrations}</h1>
+
+{/* YEAR WISE BAR CHART */}
+
+<div
+  style={{
+    background:"#fff",
+    borderRadius:"20px",
+    padding:"25px",
+    marginTop:"30px",
+    boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
+  }}
+>
+  <h3>📈 Year Wise Results</h3>
+
+  <ResponsiveContainer width="100%" height={350}>
+    <BarChart data={analytics.yearWise}>
+      <XAxis dataKey="_id" />
+      <YAxis />
+      <Tooltip />
+      <Legend />
+
+      <Bar
+        dataKey="count"
+        fill="#6366F1"
+        radius={[10,10,0,0]}
+      />
+    </BarChart>
+  </ResponsiveContainer>
 </div>
 
-<div style={styles.analyticsCard}>
-<h3>Total Results</h3>
-<h1>{analytics.totalResults}</h1>
+
+{/* CENTER WISE CHART */}
+
+<div
+  style={{
+    background:"#fff",
+    borderRadius:"20px",
+    padding:"25px",
+    marginTop:"30px",
+    boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
+  }}
+>
+  <h3>🏫 Center Wise Registrations</h3>
+
+  <ResponsiveContainer
+  width="100%"
+  height={
+    analytics?.centerWise?.length > 10
+      ? 700
+      : 400
+  }
+>
+    <BarChart
+      data={analytics.centerWise}
+      layout="vertical"
+    >
+      <XAxis type="number" />
+
+      <YAxis
+        type="category"
+        dataKey="_id"
+        width={150}
+      />
+
+      <Tooltip />
+
+      <Bar
+        dataKey="count"
+        fill="#8B5CF6"
+        radius={[0,10,10,0]}
+      />
+    </BarChart>
+  </ResponsiveContainer>
 </div>
 
-<div style={styles.analyticsCard}>
-<h3>Average Marks</h3>
-<h1>{analytics.avgMarks}</h1>
+
+{/* TOP SCORERS */}
+
+<div
+  style={{
+    background:"#fff",
+    borderRadius:"20px",
+    padding:"25px",
+    marginTop:"30px",
+    boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
+  }}
+>
+  <h3>🏆 Top 10 Scorers</h3>
+
+  <div
+  style={{
+    overflowX:"auto"
+  }}
+>
+  <table
+    style={{
+      width:"100%",
+      minWidth:"600px",
+      borderCollapse:"collapse"
+    }}
+  >
+    
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Level</th>
+        <th>Marks</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {analytics.topScorers.map((user,index)=>(
+        <tr key={index}>
+          <td>{index+1}</td>
+          <td>{user.name}</td>
+          <td>{user.examLevel}</td>
+          <td>{user.marks}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  </div>
 </div>
-
-</div>
-
-<div style={styles.card}>
-<h3>Level Wise Distribution</h3>
-
-<table style={{ width:"100%" }}>
-<thead>
-<tr>
-<th>Level</th>
-<th>Count</th>
-</tr>
-</thead>
-
-<tbody>
-{analytics.levelWise.map(item => (
-<tr key={item._id}>
-<td>{item._id}</td>
-<td>{item.count}</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
-
-<br />
-
-<div style={styles.card}>
-<h3>Year Wise Results</h3>
-
-<table style={{ width:"100%" }}>
-<thead>
-<tr>
-<th>Year</th>
-<th>Count</th>
-</tr>
-</thead>
-
-<tbody>
-{analytics.yearWise.map(item => (
-<tr key={item._id}>
-<td>{item._id}</td>
-<td>{item.count}</td>
-</tr>
-))}
-</tbody>
-</table>
-</div>
-
-</div>
-
-)}
-
+</>
+)};
 {/* -------- Message -------- */}
 {message && (
   <p style={styles.message}>{message}</p>
@@ -401,20 +550,27 @@ marginBottom:"30px"
 
 const styles = {
   container: {
-    display: "flex",
-    minHeight: "100vh",
-    fontFamily: "Arial",
-  },
+  display: "flex",
+  flexDirection:
+    window.innerWidth < 768
+      ? "column"
+      : "row",
+  minHeight: "100vh",
+  fontFamily: "Arial",
+},
 
   sidebar: {
-  width: "250px",
+  width:
+    window.innerWidth < 768
+      ? "100%"
+      : "250px",
   background: "#1f2937",
   color: "white",
   padding: "20px",
   display: "flex",
   flexDirection: "column",
-  gap: "10px",            // ✅ spacing between buttons
-},  
+  gap: "10px",
+},
 
   logo: {
     marginBottom: "30px",
@@ -433,7 +589,7 @@ const styles = {
 
   content: {
   flex: 1,
-  padding: "40px",
+  padding: window.innerWidth < 768 ? "15px" : "40px",
   background: "#f3f4f6",
   display: "flex",
   flexDirection: "column",
@@ -443,13 +599,13 @@ const styles = {
     marginBottom: "30px",
   },
 
-  card: {
+card: {
   background: "white",
-  padding: "30px",
-  borderRadius: "10px",
-  boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
-  width: "100%",          // ✅ full width
-  maxWidth: "500px",      // ✅ limit size
+  padding: "25px",
+  borderRadius: "20px",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+  width: "100%",
+  maxWidth: "100%",
 },
 
   fileInput: {
@@ -472,12 +628,25 @@ const styles = {
     color: "green",
   },
 
-  analyticsCard: {
+analyticsCard: {
+  background:
+    "linear-gradient(135deg,#4F46E5,#7C3AED)",
+  color:"#fff",
+  padding:"30px",
+  borderRadius:"24px",
+  textAlign:"center",
+  boxShadow:
+    "0 20px 40px rgba(79,70,229,0.35)",
+  transition:"all 0.3s ease",
+},
+
+chartCard: {
   background: "white",
-  padding: "20px",
-  borderRadius: "10px",
-  textAlign: "center",
-  boxShadow: "0 5px 15px rgba(0,0,0,0.1)"
+  padding: "25px",
+  borderRadius: "20px",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+  width: "100%",
+  maxWidth: "100%"
 },
 };
 
