@@ -17,14 +17,14 @@ async function createAdmin() {
     console.log("✅ MongoDB Connected");
 
     const admin = new User({
-      lndId: "ADMIN001",
+      lndId: "JITU@1008",
       name: "Super Admin",
       age: 30,
       gender: "Male",
-      mobileNumber: "9999999999",
+      mobileNumber: "1234567891",
       examCenter: "HQ",
       role: "admin",
-      password: "admin123"
+      password: "LaljiShree1008"
     });
 
     await admin.save();

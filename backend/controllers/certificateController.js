@@ -5,6 +5,14 @@ const User = require("../models/User");
 const Result = require("../models/Result");
 const Registration = require("../models/Registration");
 
+const imagePath = path.join(
+  __dirname,
+  "../assets/certificate-template.png"
+);
+
+const TEMPLATE_BYTES =
+  fs.readFileSync(imagePath);
+
 exports.downloadCertificate = async (req, res) => {
   try {
     const year = Number(req.params.year);
@@ -13,14 +21,17 @@ exports.downloadCertificate = async (req, res) => {
     // FETCH RESULT
     // ==========================
 
-    const result = await Result.findOne({
-      lndId: req.user.lndId,
-      examYear: year
-    });
+    const result = await Result.findOne(
+  {
+    lndId: req.user.lndId,
+    examYear: year
+  }
+).lean();
 
-    const user = await User.findOne({
-    lndId: result.lndId
-    });
+    const user = await User.findOne(
+  { lndId: result.lndId },
+  { examCenter: 1 }
+).lean();
 
 
     if (!result) {
@@ -43,7 +54,7 @@ exports.downloadCertificate = async (req, res) => {
       "../assets/certificate-template.png"
     );
 
-    const imageBytes = fs.readFileSync(imagePath);
+    const imageBytes = TEMPLATE_BYTES;
 
     const pdfDoc = await PDFDocument.create();
 
@@ -77,8 +88,8 @@ exports.downloadCertificate = async (req, res) => {
 
     page.drawText(result.name || "", {
       x: 260,
-      y: 585,
-      size: 34,
+      y: 600,
+      size: 40,
       font
     });
 
@@ -86,13 +97,22 @@ exports.downloadCertificate = async (req, res) => {
     // YEAR
     // ==========================
 
+
+    page.drawText(String(result.examYear), {
+  x: 900,
+  y: 1300,
+  size: 90,
+  font,
+  color: rgb(0.35, 0.15, 0.05)
+});
+
     page.drawText(
       String(result.examYear),
       {
-        x: 915,
-        y: 1290,
-        size: 70,
-        color: rgb(1, 1, 0), // Yellow
+        x: 902,
+        y: 1310,
+        size: 90,
+        color: rgb(0.96, 0.76, 0.18), // Yellow
         font
       }
     );
@@ -105,7 +125,7 @@ exports.downloadCertificate = async (req, res) => {
       user?.examCenter || "",
       {
         x: 240,
-        y: 490,
+        y: 500,
         size: 40,
         font
       }
@@ -119,8 +139,8 @@ exports.downloadCertificate = async (req, res) => {
       displayLevel,
       {
         x: 800,
-        y: 490,
-        size: 35,
+        y: 500,
+        size: 40,
         font
       }
     );
@@ -132,9 +152,9 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       String(result.marks || ""),
       {
-        x: 415,
-        y: 400,
-        size: 35,
+        x: 460,
+        y: 410,
+        size: 40,
         font
       }
     );
@@ -146,9 +166,9 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       "100",
       {
-        x: 850,
-        y: 400,
-        size: 35,
+        x: 870,
+        y: 415,
+        size: 40,
         font
       }
     );

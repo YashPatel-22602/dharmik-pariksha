@@ -14,7 +14,7 @@ const workbook = xlsx.readFile(req.file.path);
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
 const rows = xlsx.utils.sheet_to_json(sheet);
-
+console.log("Rows found:", rows.length);
 const users = rows.map(row => ({
 
 lndId: row.LNDID,
@@ -33,6 +33,9 @@ role: "user"
 
 }));
 
+console.log("Users prepared:", users.length);
+
+
 await User.insertMany(users);
 
 res.json({
@@ -41,8 +44,8 @@ message: "Legacy users uploaded successfully"
 
 } catch (error) {
 
-console.error(error);
-
+console.error("UPLOAD ERROR:");
+  console.error(error);
 res.status(500).json({
 message: "Upload failed"
 });
@@ -60,20 +63,44 @@ const workbook = xlsx.readFile(req.file.path);
 const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
 const rows = xlsx.utils.sheet_to_json(sheet);
+console.log(rows[0]);
+const results = rows.map(row => {
 
-const results = rows.map(row => ({
+  const excelDate = new Date(
+    Math.round(
+      (row.SubmittedAt - 25569) *
+      86400 *
+      1000
+    )
+  );
 
-lndId: row.LNDID,
-name: row.Name,
+  // Convert Excel IST -> UTC
+  excelDate.setMinutes(
+    excelDate.getMinutes() - 330
+  );
 
-examLevel: String (row.Level),
-examYear: Number(row.Year),
+  return {
+    lndId: row.LNDID,
+    name: row.Name,
+    examLevel: String(row.Level),
+    examYear: Number(row.Year),
+    marks: parseFloat(row.Marks) || 0,
+    submittedAt: excelDate
+  };
+});
 
-marks: Number(row.Marks),
+const excelDate = rows[0].SubmittedAt;
 
-submittedAt: new Date(row.SubmittedAt)
+const jsDate = new Date(
+  Math.round(
+    (excelDate - 25569) * 86400 * 1000
+  )
+);
 
-}));
+console.log("Excel:", excelDate);
+console.log("Converted:", jsDate);
+
+console.log(rows.SubmittedAt);
 
 await Result.insertMany(
   results,
@@ -341,24 +368,36 @@ exports.getAnalytics = async (req, res) => {
     ]);
 
     // Top 10 Scorers
-    const topScorers = await Result.find()
-      .sort({ marks: -1 })
-      .limit(10)
-      .select("name marks examLevel");
+    const levels = await Result.distinct("examLevel");
+
+const topLevelWise = {};
+
+for (const level of levels) {
+  topLevelWise[level] = await Result.find({
+    examLevel: level
+  })
+    .sort({
+      marks: -1,
+      submittedAt: 1
+    })
+    .limit(3)
+    .select(
+      "name marks examLevel submittedAt"
+    );
+}
 
     res.json({
-      totalUsers,
-      totalRegistrations,
-      totalResults,
-      avgMarks:
-        avgResult[0]?.avgMarks?.toFixed(2) || 0,
-      levelWise,
-      yearWise,
-      genderWise,
-      centerWise,
-      topScorers
-    });
-
+  totalUsers,
+  totalRegistrations,
+  totalResults,
+  avgMarks:
+    avgResult[0]?.avgMarks?.toFixed(2) || 0,
+  levelWise,
+  yearWise,
+  genderWise,
+  centerWise,
+  topLevelWise
+});
   } catch (err) {
 
     console.error(err);

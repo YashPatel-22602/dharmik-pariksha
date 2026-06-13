@@ -56,7 +56,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/upload-legacy-users",
+        "https://dharmik-pariksha.onrender.com/api/admin/upload-legacy-users",
         {
           method: "POST",
           body: formData,
@@ -89,7 +89,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/upload-marks",
+        "https://dharmik-pariksha.onrender.com/api/admin/upload-marks",
         {
           method: "POST",
           body: formData,
@@ -108,7 +108,7 @@ const COLORS = [
   const downloadZip = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/admin/download-users-by-center"
+        "https://dharmik-pariksha.onrender.com/api/admin/download-users-by-center"
       );
 
       const blob = await response.blob();
@@ -132,7 +132,7 @@ const COLORS = [
 const downloadZip1 = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/admin/download-users-reg-for-exam"
+        "https://dharmik-pariksha.onrender.com/api/admin/download-users-reg-for-exam"
       );
 
       const blob = await response.blob();
@@ -158,7 +158,7 @@ const downloadZip1 = async () => {
   try {
 
     const res = await fetch(
-      "http://localhost:5000/api/admin/analytics",
+      "https://dharmik-pariksha.onrender.com/api/admin/analytics",
       {
         headers: {
           Authorization:
@@ -298,7 +298,7 @@ const downloadZip1 = async () => {
 onClick={async () => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/admin/toggle-registration",
+      "https://dharmik-pariksha.onrender.com/api/admin/toggle-registration",
       {
         method: "POST",
         headers: {
@@ -454,7 +454,7 @@ innerRadius={
     boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
   }}
 >
-  <h3>🏫 Center Wise Registrations</h3>
+  <h3>🏫 Center Wise Users Registered for the Exam</h3>
 
   <ResponsiveContainer
   width="100%"
@@ -488,7 +488,7 @@ innerRadius={
 </div>
 
 
-{/* TOP SCORERS */}
+{/* TOP 3 LEVEL WISE TOPPERS */}
 
 <div
   style={{
@@ -496,45 +496,124 @@ innerRadius={
     borderRadius:"20px",
     padding:"25px",
     marginTop:"30px",
-    boxShadow:"0 10px 30px rgba(0,0,0,0.08)"
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.08)"
   }}
 >
-  <h3>🏆 Top 10 Scorers</h3>
 
-  <div
+<h3
   style={{
-    overflowX:"auto"
+    fontSize:"28px",
+    fontWeight:"700",
+    marginBottom:"20px"
   }}
 >
-  <table
-    style={{
-      width:"100%",
-      minWidth:"600px",
-      borderCollapse:"collapse"
-    }}
-  >
-    
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Name</th>
-        <th>Level</th>
-        <th>Marks</th>
-      </tr>
-    </thead>
+🏆 Level Wise Toppers
+</h3>
 
-    <tbody>
-      {analytics.topScorers.map((user,index)=>(
-        <tr key={index}>
-          <td>{index+1}</td>
-          <td>{user.name}</td>
-          <td>{user.examLevel}</td>
-          <td>{user.marks}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-  </div>
+{Object.entries(
+  analytics.topLevelWise || {}
+).map(([level, students]) => (
+
+<div
+  key={level}
+  style={{
+    marginBottom:"30px"
+  }}
+>
+
+<div
+  style={{
+    background:
+      "linear-gradient(135deg,#4F46E5,#7C3AED)",
+    color:"#fff",
+    padding:"12px 20px",
+    borderRadius:"12px",
+    marginBottom:"15px",
+    fontSize:"20px",
+    fontWeight:"bold"
+  }}
+>
+🎓 Level {level}
+</div>
+
+<table
+  style={{
+    width:"100%",
+    borderCollapse:"collapse"
+  }}
+>
+
+<thead>
+
+<tr
+  style={{
+    background:"#EEF2FF"
+  }}
+>
+<th style={styles.tableHead}>Rank</th>
+<th style={styles.tableHead}>Name</th>
+<th style={styles.tableHead}>Marks</th>
+<th style={styles.tableHead}>
+Submission Time
+</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{students.map(
+(student,index)=>(
+
+<tr key={index}>
+
+<td style={styles.tableCell}>
+{
+index===0
+? "🥇"
+: index===1
+? "🥈"
+: "🥉"
+}
+</td>
+
+<td style={styles.tableCell}>
+{student.name}
+</td>
+
+<td style={styles.tableCell}>
+{student.marks}
+</td>
+
+<td style={styles.tableCell}>
+{
+new Date(student.submittedAt)
+.toLocaleString("en-IN", {
+  timeZone: "Asia/Kolkata",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit"
+})
+}
+</td>
+
+</tr>
+
+)
+)}
+
+</tbody>
+
+</table>
+
+</div>
+
+))}
+
 </div>
 </>
 )};
@@ -549,6 +628,21 @@ innerRadius={
 };
 
 const styles = {
+
+  tableHead: {
+  padding: "12px",
+  textAlign: "left",
+  color: "#4338CA",
+  borderBottom:
+    "2px solid #E5E7EB"
+},
+
+tableCell: {
+  padding: "12px",
+  borderBottom:
+    "1px solid #E5E7EB"
+},
+
   container: {
   display: "flex",
   flexDirection:

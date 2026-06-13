@@ -5,7 +5,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Results from "./pages/Results";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
-
+import Loader from "./components/Loader";
 
 function App() {
   return (

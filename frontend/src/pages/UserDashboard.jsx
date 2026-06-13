@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import API from "../services/api";
+import Loader from "../components/Loader";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -32,7 +33,7 @@ const [availableLevels, setAvailableLevels] = useState([]);
 const [loading,setLoading] = useState(true);
 const [error,setError] = useState("");
 const [certificates,setCertificates] =useState([]);
-
+const [certificateLoading,setCertificateLoading] = useState(false);
 const [theme,setTheme] = useState(() => {
 const saved = localStorage.getItem("theme");
 
@@ -106,6 +107,8 @@ const downloadCertificate = async (year) => {
 
   try {
 
+    setCertificateLoading(true);
+
     const response = await API.get(
       `/certificate/${year}`,
       {
@@ -120,7 +123,9 @@ const downloadCertificate = async (year) => {
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = `Certificate-${year}.pdf`;
+
+    link.download =
+      `Certificate-${year}.pdf`;
 
     document.body.appendChild(link);
 
@@ -128,15 +133,22 @@ const downloadCertificate = async (year) => {
 
     link.remove();
 
+    window.URL.revokeObjectURL(url);
+
   } catch (err) {
 
     console.error(err);
 
-    alert("Certificate download failed");
+    alert(
+      "Certificate download failed"
+    );
+
+  } finally {
+
+    setCertificateLoading(false);
 
   }
-
-};
+}
 
 const logout = () => {
 localStorage.removeItem("token");
@@ -229,20 +241,31 @@ const progressData = results
 
 if(loading){
 return(
+  <>
+  {certificateLoading && <Loader />}
 <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
-Loading Dashboard...
+  <Loader />
 </div>
+</>
 );
 }
 
 if(error){
 return(
-<div className="min-h-screen flex flex-col items-center justify-center dark:bg-gray-900">
-<p className="text-red-500 mb-4">{error}</p>
-<button onClick={fetchData} className="px-4 py-2 bg-indigo-600 text-white rounded-xl">
-Retry
-</button>
-</div>
+<>
+  {certificateLoading && <Loader />}
+
+  <div className="min-h-screen flex flex-col items-center justify-center dark:bg-gray-900">
+    <p className="text-red-500 mb-4">{error}</p>
+
+    <button
+      onClick={fetchData}
+      className="px-4 py-2 bg-indigo-600 text-white rounded-xl"
+    >
+      Retry
+    </button>
+  </div>
+</>
 );
 }
 

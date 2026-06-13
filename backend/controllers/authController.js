@@ -51,13 +51,13 @@ const registerUser = async (req, res) => {
     });
 
     console.log("Mobile:", mobileNumber);
-    const smsMessage = `Registration successful. Your LND ID is ${lndId}`;
-        console.log("Message:", smsMessage);
+    //const smsMessage = `Registration successful. Your LND ID is ${lndId}`;
+        //console.log("Message:", smsMessage);
 
     //sendSms(mobileNumber, smsMessage);
-    const smsResult = await sendSms(mobileNumber, smsMessage);
+    //const smsResult = await sendSms(mobileNumber, smsMessage);
 
-console.log("SMS RESULT:", smsResult);
+//console.log("SMS RESULT:", smsResult);
 
     res.status(201).json({
       success: true,

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import examCenterCodes from "../config/examCenterCodes";
 import jsPDF from "jspdf";
+import Loader from "../components/Loader";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -177,6 +178,10 @@ const centerName = selectedCenter
   };
 
   return (
+      
+    <>
+{loading && <Loader />}
+
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-black px-4">
 
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl w-full max-w-3xl p-10 text-white">
@@ -318,5 +323,6 @@ const centerName = selectedCenter
 
       </div>
     </div>
+    </>
   );
 }

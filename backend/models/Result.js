@@ -21,7 +21,7 @@ required: true
 },
 
 marks: {
-type: String,
+  type: Number,
 required: true
 },
 
