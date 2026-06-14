@@ -406,7 +406,7 @@ className="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 dark:text-white"
 <StatCard title="Total Exams" value={totalExams}/>
 <StatCard title="Highest Score" value={highestScore}/>
 <StatCard title="Average Score" value={averageScore}/>
-<StatCard title="Rank" value={getRank()}/>
+{/* <StatCard title="Rank" value={getRank()}/> */}
 </div>
 
 {/* BEST EXAM */}

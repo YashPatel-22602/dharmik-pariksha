@@ -300,15 +300,26 @@ const centerName = selectedCenter
               required
             >
               <option value="">Select Exam Center</option>
-              {examCenterCodes.map((item, index) => {
-              const [code, center] = Object.entries(item)[0];
+              {[...examCenterCodes]
+  .sort((a, b) => {
+    const centerA = Object.values(a)[0];
+    const centerB = Object.values(b)[0];
 
-              return (
-                <option key={`${code}-${index}`} value={code}>
-                  {center} ({code})
-                </option>
-              );
-            })}
+    return centerA.localeCompare(centerB);
+  })
+  .map((item, index) => {
+
+    const [code, center] = Object.entries(item)[0];
+
+    return (
+      <option
+        key={`${code}-${index}`}
+        value={code}
+      >
+        {center}
+      </option>
+    );
+  })}
 
             </select>
           </div>

@@ -394,26 +394,46 @@ exports.getAnalytics = async (req, res) => {
       }
     ]);
 
-    // Top 10 Scorers
-    const levels = await Result.distinct("examLevel");
+    // Top 3 Scorers Level Wise + Year Wise
 
-const topLevelWise = {};
+const years = await Result.distinct(
+  "examYear"
+);
 
-for (const level of levels) {
-  topLevelWise[level] = await Result.find({
-    examLevel: level
-  })
-    .sort({
-      marks: -1,
-      submittedAt: 1
-    })
-    .limit(3)
-    .select(
-      "name marks examLevel submittedAt"
-    );
+years.sort((a, b) => b - a);
+
+const topLevelWiseYearWise = {};
+
+for (const year of years) {
+
+  topLevelWiseYearWise[year] = {};
+
+  const levels = await Result.distinct(
+    "examLevel",
+    {
+      examYear: year
+    }
+  );
+
+  for (const level of levels) {
+
+    topLevelWiseYearWise[year][level] =
+      await Result.find({
+        examYear: year,
+        examLevel: level
+      })
+      .sort({
+        marks: -1,
+        submittedAt: 1
+      })
+      .limit(3)
+      .select(
+        "name marks examLevel examYear submittedAt"
+      );
+  }
 }
 
-    res.json({
+res.json({
   totalUsers,
   totalRegistrations,
   totalResults,
@@ -423,7 +443,7 @@ for (const level of levels) {
   yearWise,
   genderWise,
   centerWise,
-  topLevelWise
+  topLevelWiseYearWise
 });
   } catch (err) {
 

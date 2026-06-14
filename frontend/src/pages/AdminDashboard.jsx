@@ -30,6 +30,8 @@ const COLORS = [
   const [message, setMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [analytics, setAnalytics] = useState(null);
+  const [selectedYear, setSelectedYear] = useState("");
+const [selectedLevel, setSelectedLevel] = useState("");
   const handleLogout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
@@ -62,7 +64,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/upload-legacy-users",
+        "https://dharmik-pariksha.onrender.com/api/admin/upload-legacy-users",
         {
           method: "POST",
           body: formData,
@@ -95,7 +97,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/upload-marks",
+        "https://dharmik-pariksha.onrender.com/api/admin/upload-marks",
         {
           method: "POST",
           body: formData,
@@ -114,7 +116,7 @@ const COLORS = [
   const downloadZip = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/admin/download-users-by-center"
+        "https://dharmik-pariksha.onrender.com/api/admin/download-users-by-center"
       );
 
       const blob = await response.blob();
@@ -138,7 +140,7 @@ const COLORS = [
 const downloadZip1 = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/admin/download-users-reg-for-exam"
+        "https://dharmik-pariksha.onrender.com/api/admin/download-users-reg-for-exam"
       );
 
       const blob = await response.blob();
@@ -164,7 +166,7 @@ const downloadZip1 = async () => {
   try {
 
     const res = await fetch(
-      "http://localhost:5000/api/admin/analytics",
+      "https://dharmik-pariksha.onrender.com/api/admin/analytics",
       {
         headers: {
           Authorization:
@@ -314,7 +316,7 @@ const downloadZip1 = async () => {
 onClick={async () => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/admin/toggle-registration",
+      "https://dharmik-pariksha.onrender.com/api/admin/toggle-registration",
       {
         method: "POST",
         headers: {
@@ -526,6 +528,174 @@ innerRadius={
 >
 🏆 Level Wise Toppers
 </h3>
+
+<div
+  style={{
+    display: "flex",
+    gap: "15px",
+    marginBottom: "20px",
+    flexWrap: "wrap"
+  }}
+>
+
+<select
+  value={selectedYear}
+  onChange={(e) =>
+    setSelectedYear(e.target.value)
+  }
+  style={{
+    padding: "10px",
+    borderRadius: "8px"
+  }}
+>
+  <option value="">
+    Select Year
+  </option>
+
+  {Object.keys(
+    analytics.topLevelWiseYearWise || {}
+  ).map(year => (
+    <option key={year} value={year}>
+      {year}
+    </option>
+  ))}
+</select>
+
+<select
+  value={selectedLevel}
+  onChange={(e) =>
+    setSelectedLevel(e.target.value)
+  }
+  style={{
+    padding: "10px",
+    borderRadius: "8px"
+  }}
+>
+  <option value="">
+    Select Level
+  </option>
+
+  {selectedYear &&
+    Object.keys(
+      analytics.topLevelWiseYearWise[selectedYear] || {}
+    ).map(level => (
+      <option key={level} value={level}>
+        Level {level}
+      </option>
+    ))}
+</select>
+
+</div>
+
+{
+selectedYear &&
+selectedLevel &&
+analytics.topLevelWiseYearWise?.[
+  selectedYear
+]?.[selectedLevel] && (
+
+<div
+  style={{
+    marginBottom: "30px"
+  }}
+>
+
+<div
+  style={{
+    background:
+      "linear-gradient(135deg,#059669,#2563EB)",
+    color: "#fff",
+    padding: "12px 20px",
+    borderRadius: "12px",
+    marginBottom: "15px",
+    fontWeight: "bold"
+  }}
+>
+🏆 Top 3 Scorers 
+Year {selectedYear} -
+ Level {selectedLevel}
+</div>
+
+<table
+  style={{
+    width: "100%",
+    borderCollapse: "collapse"
+  }}
+>
+
+<thead>
+
+<tr
+  style={{
+    background: "#EEF2FF"
+  }}
+>
+<th style={styles.tableHead}>
+Rank
+</th>
+
+<th style={styles.tableHead}>
+Name
+</th>
+
+<th style={styles.tableHead}>
+Marks
+</th>
+
+<th style={styles.tableHead}>
+Submission Time
+</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{
+analytics.topLevelWiseYearWise[
+  selectedYear
+][selectedLevel]
+.map((student,index)=>(
+
+<tr key={index}>
+
+<td style={styles.tableCell}>
+{
+index===0
+? "🥇"
+: index===1
+? "🥈"
+: "🥉"
+}
+</td>
+
+<td style={styles.tableCell}>
+{student.name}
+</td>
+
+<td style={styles.tableCell}>
+{student.marks}
+</td>
+
+<td style={styles.tableCell}>
+{
+new Date(student.submittedAt)
+.toLocaleString("en-IN")
+}
+</td>
+
+</tr>
+
+))
+}
+
+</tbody>
+
+</table>
+
+</div>
+
+)}
 
 {Object.entries(
   analytics.topLevelWise || {}
