@@ -171,47 +171,54 @@ router.get(
         ];
       }
 
-      // Basic Passed
-      else if (
-        latestResult.examLevel === "Basic"
-      ) {
+      // ABSENT / FAILED (Marks = 0)
+// Must repeat same level
 
-        levels = ["Level 1"];
-      }
+if (latestResult.marks === 0) {
 
-      // Level 1 Passed
-      else if (
-        latestResult.examLevel === "1"
-      ) {
+  if (latestResult.examLevel === "Basic") {
+    levels = ["Basic"];
+  }
 
-        levels = ["Level 2"];
-      }
+  else if (latestResult.examLevel === "1") {
+    levels = ["Level 1"];
+  }
 
-      // Level 2 Passed
-      else if (
-        latestResult.examLevel === "2"
-      ) {
+  else if (latestResult.examLevel === "2") {
+    levels = ["Level 2"];
+  }
 
-        levels = ["Level 3"];
-      }
+  else if (latestResult.examLevel === "3") {
+    levels = ["Level 3"];
+  }
 
-      // Level 3 Passed
-      else if (
-        latestResult.examLevel === "3"
-      ) {
+}
 
-        levels = ["Level 3"];
-      }
+// PASSED → Next Level
 
-      else {
+else if (
+  latestResult.examLevel === "Basic"
+) {
+  levels = ["Level 1"];
+}
 
-        levels = [
-          "Basic",
-          "Level 1",
-          "Level 2"
-        ];
-      }
+else if (
+  latestResult.examLevel === "1"
+) {
+  levels = ["Level 2"];
+}
 
+else if (
+  latestResult.examLevel === "2"
+) {
+  levels = ["Level 3"];
+}
+
+else if (
+  latestResult.examLevel === "3"
+) {
+  levels = ["Level 3"];
+}
       res.json({
         success: true,
         levels
