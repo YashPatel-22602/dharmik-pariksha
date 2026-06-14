@@ -21,7 +21,7 @@ async function createAdmin() {
       name: "Super Admin",
       age: 30,
       gender: "Male",
-      mobileNumber: "1234567891",
+      mobileNumber: "7788777881",
       examCenter: "HQ",
       role: "admin",
       password: "LaljiShree1008"

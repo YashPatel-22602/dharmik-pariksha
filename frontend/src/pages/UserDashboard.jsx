@@ -378,7 +378,7 @@ return(
   </button>
   <div>
     <h1 className="text-3xl font-bold dark:text-white">
-      Welcome, {profile?.name || "User"} 👋
+      Jay Shree Swaminarayan, {profile?.name || "User"} 👋
     </h1>
     <p className="text-gray-500 dark:text-gray-400">
       Performance insights & analytics

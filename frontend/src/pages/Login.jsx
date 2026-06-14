@@ -42,7 +42,7 @@ export default function Login() {
       <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
 
         <h1 className="text-4xl font-extrabold text-center mb-6 text-indigo-700 tracking-wide">
-        Satsang Gnan Pariksha
+        Satsang Gnan Pariksha - 2026
         </h1>
 
         <div className="flex mb-6">

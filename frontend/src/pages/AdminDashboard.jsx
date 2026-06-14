@@ -56,7 +56,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/upload-legacy-users",
+        "http://localhost:5000/api/admin/upload-legacy-users",
         {
           method: "POST",
           body: formData,
@@ -89,7 +89,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/upload-marks",
+        "http://localhost:5000/api/admin/upload-marks",
         {
           method: "POST",
           body: formData,
@@ -108,7 +108,7 @@ const COLORS = [
   const downloadZip = async () => {
     try {
       const response = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/download-users-by-center"
+        "http://localhost:5000/api/admin/download-users-by-center"
       );
 
       const blob = await response.blob();
@@ -132,7 +132,7 @@ const COLORS = [
 const downloadZip1 = async () => {
     try {
       const response = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/download-users-reg-for-exam"
+        "http://localhost:5000/api/admin/download-users-reg-for-exam"
       );
 
       const blob = await response.blob();
@@ -158,7 +158,7 @@ const downloadZip1 = async () => {
   try {
 
     const res = await fetch(
-      "https://dharmik-pariksha.onrender.com/api/admin/analytics",
+      "http://localhost:5000/api/admin/analytics",
       {
         headers: {
           Authorization:
@@ -298,7 +298,7 @@ const downloadZip1 = async () => {
 onClick={async () => {
   try {
     const res = await fetch(
-      "https://dharmik-pariksha.onrender.com/api/admin/toggle-registration",
+      "http://localhost:5000/api/admin/toggle-registration",
       {
         method: "POST",
         headers: {

@@ -1,9 +1,11 @@
 const xlsx = require("xlsx");
 const User = require("../models/User");
+const examCenterCodes = require("../config/examCenterCodes");
 const ExamRegistered = require("../models/Registration");
 const Result = require("../models/Result");
 const ExcelJS = require("exceljs");
 const archiver = require("archiver");
+
 
 exports.uploadLegacyUsers = async (req, res) => {
 
@@ -15,25 +17,50 @@ const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
 const rows = xlsx.utils.sheet_to_json(sheet);
 console.log("Rows found:", rows.length);
-const users = rows.map(row => ({
+const users = rows.map(row => {
 
-lndId: row.LNDID,
+  const examCenter = row["Exam Center"];
 
-name: row.Name,
+  const centerKey =
+    examCenter?.trim().toLowerCase();
 
-age: row.Age,
+  const examCenterCode =
+    examCenterCodes[centerKey] || null;
 
-gender: row.Gender,
+  return {
 
-mobileNumber: row["Mobile Number"],
+    lndId: row.LNDID,
 
-examCenter: row["Exam Center"],
+    name: row.Name,
 
-role: "user"
+    age: row.Age,
 
-}));
+    gender: row.Gender,
+
+    mobileNumber: row["Mobile Number"],
+
+    examCenter,
+
+    examCenterCode,
+
+    role: "user"
+
+  };
+
+});
 
 console.log("Users prepared:", users.length);
+
+const invalidCenters = users.filter(
+  user => !user.examCenterCode
+);
+
+if (invalidCenters.length > 0) {
+  return res.status(400).json({
+    message:
+      `Invalid exam center found in Excel: ${invalidCenters[0].examCenter}`
+  });
+}
 
 
 await User.insertMany(users);
