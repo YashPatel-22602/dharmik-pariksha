@@ -30,6 +30,12 @@ const COLORS = [
   const [message, setMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [analytics, setAnalytics] = useState(null);
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+
+  window.location.href = "/";
+};
 
   useEffect(() => {
 
@@ -56,7 +62,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/upload-legacy-users",
+        "http://localhost:5000/api/admin/upload-legacy-users",
         {
           method: "POST",
           body: formData,
@@ -89,7 +95,7 @@ const COLORS = [
 
     try {
       const res = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/upload-marks",
+        "http://localhost:5000/api/admin/upload-marks",
         {
           method: "POST",
           body: formData,
@@ -108,7 +114,7 @@ const COLORS = [
   const downloadZip = async () => {
     try {
       const response = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/download-users-by-center"
+        "http://localhost:5000/api/admin/download-users-by-center"
       );
 
       const blob = await response.blob();
@@ -132,7 +138,7 @@ const COLORS = [
 const downloadZip1 = async () => {
     try {
       const response = await fetch(
-        "https://dharmik-pariksha.onrender.com/api/admin/download-users-reg-for-exam"
+        "http://localhost:5000/api/admin/download-users-reg-for-exam"
       );
 
       const blob = await response.blob();
@@ -158,7 +164,7 @@ const downloadZip1 = async () => {
   try {
 
     const res = await fetch(
-      "https://dharmik-pariksha.onrender.com/api/admin/analytics",
+      "http://localhost:5000/api/admin/analytics",
       {
         headers: {
           Authorization:
@@ -219,6 +225,16 @@ const downloadZip1 = async () => {
 >
   Analytics
   </button>
+
+  <button
+  style={{
+    ...styles.menuBtn,
+    background: "#DC2626"
+  }}
+  onClick={handleLogout}
+>
+  Logout
+</button>
 </div>
       {/* Content */}
       <div style={styles.content}>
@@ -298,7 +314,7 @@ const downloadZip1 = async () => {
 onClick={async () => {
   try {
     const res = await fetch(
-      "https://dharmik-pariksha.onrender.com/api/admin/toggle-registration",
+      "http://localhost:5000/api/admin/toggle-registration",
       {
         method: "POST",
         headers: {

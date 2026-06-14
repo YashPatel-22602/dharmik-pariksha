@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import Loader from "../components/Loader";
+import logo from "../assets/logo.png";
 export default function Login() {
   const navigate = useNavigate();
 
@@ -38,19 +39,79 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700">
+    <div
+className="
+min-h-screen
+flex
+items-center
+justify-center
+px-4
+"
+style={{
+background:"#7a004b"
+}}
+>
       <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
 
-        <h1 className="text-4xl font-extrabold text-center mb-6 text-indigo-700 tracking-wide">
-        Satsang Gnan Pariksha - 2026
-        </h1>
+        <div className="flex justify-center mb-4">
+  <img
+    src={logo}
+    alt="Logo"
+    className="
+      w-28
+      md:w-40
+      object-contain
+    "
+  />
+</div>
+        <div className="text-center mb-6">
+  <h1
+    className="
+      text-4xl
+      md:text-5xl
+      font-extrabold
+      tracking-wide
+      text-[#7a004b]
+    "
+    style={{
+      textShadow:
+        "2px 2px 8px rgba(122,0,75,0.25)"
+    }}
+  >
+    Satsang Gnan
+  </h1>
+
+  <h2
+    className="
+      text-3xl
+      md:text-4xl
+      font-black
+      mt-2
+      text-[#7a004b]
+    "
+  >
+    Pariksha 2026
+  </h2>
+
+  <div
+    className="mx-auto mt-3"
+    style={{
+      width: "120px",
+      height: "4px",
+      background:
+        "linear-gradient(to right,#7a004b,#b0006d,#7a004b)",
+      borderRadius: "999px"
+    }}
+  />
+</div>
+
 
         <div className="flex mb-6">
           <button
             onClick={() => setActiveTab("user")}
             className={`w-1/2 py-2 font-semibold rounded-l-lg ${
               activeTab === "user"
-                ? "bg-indigo-600 text-white"
+                ? "bg-[#7a004b] text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
           >
@@ -61,7 +122,7 @@ export default function Login() {
             onClick={() => setActiveTab("admin")}
             className={`w-1/2 py-2 font-semibold rounded-r-lg ${
               activeTab === "admin"
-                ? "bg-indigo-600 text-white"
+                ? "bg-[#7a004b] text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
           >
@@ -76,7 +137,7 @@ export default function Login() {
             placeholder="LND ID"
             value={lndId}
             onChange={(e) => setLndId(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+            className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7a004b]"
             required
           />
 
@@ -86,7 +147,7 @@ export default function Login() {
               placeholder="Admin Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7a004b]"
               required
             />
           )}
@@ -97,7 +158,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
+            className="w-full bg-[#7a004b] text-white py-2 rounded-lg font-semibold hover:bg-[#5c0038] transition"
           >
             Login
           </button>
@@ -108,7 +169,7 @@ export default function Login() {
     For New User Registration Click Here ---{'>'} {" "}
     <span
       onClick={() => navigate("/register")}
-      className="text-indigo-600 cursor-pointer font-semibold hover:underline"
+      className="text-[#7a004b] cursor-pointer font-semibold hover:underline"
     >
       Register
     </span>

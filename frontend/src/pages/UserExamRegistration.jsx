@@ -11,7 +11,7 @@ const UserExamRegistration = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     setUser(storedUser);
 
-    fetch("https://dharmik-pariksha.onrender.com/api/admin/registration-status")
+    fetch("http://localhost:5000/api/admin/registration-status")
       .then(res => res.json())
       .then(data => setIsOpen(data.isOpen));
   }, []);
@@ -20,7 +20,7 @@ const UserExamRegistration = () => {
     e.preventDefault();
 
     const res = await fetch(
-      "https://dharmik-pariksha.onrender.com/api/user/register-exam",
+      "http://localhost:5000/api/user/register-exam",
       {
         method: "POST",
         headers: {
