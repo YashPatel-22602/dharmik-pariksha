@@ -159,17 +159,20 @@ router.get(
 
       console.log("LATEST RESULT:", latestResult);
 
-      let levels = [];
+      //let levels = [];
 
       // NEW USER
-      if (!latestResult) {
-
-        levels = [
-          "Basic",
-          "Level 1",
-          "Level 2"
-        ];
-      }
+      // NEW USER
+if (!latestResult) {
+  return res.json({
+    success: true,
+    levels: [
+      "Basic",
+      "Level 1",
+      "Level 2"
+    ]
+  });
+}
 
       // ABSENT / FAILED (Marks = 0)
 // Must repeat same level
@@ -225,14 +228,13 @@ else if (
       });
 
     } catch (err) {
+  console.error("AVAILABLE LEVEL ERROR:");
+  console.error(err);
 
-      console.error(err);
-
-      res.status(500).json({
-        message: "Server Error"
-      });
-
-    }
+  res.status(500).json({
+    message: err.message
+  });
+}
 
   }
 );
