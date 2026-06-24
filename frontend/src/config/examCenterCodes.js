@@ -96,7 +96,16 @@
     { "055": "Sarangpipdi_Navda" },
     { "056": "Ambaliya_Ghed" },
     { "057": "Surat_Prerana" },
-    { "058": "Surat_RiveraGreens" }
-  ];
+    { "058": "Surat_RiveraGreens" },
+    { "059": "Surat_Kamrej" },
+    { "060": "Dhareshwar" },
+    { "061": "Kharghar" },
+    { "062": "Agatrai" },
+    { "063": "Bhuleshwar" },
+    { "064": "Botad" },
+    { "065": "Bhupgadh" },
+    { "066": "Gadhada" },
+    { "067": "Shankarpara" }
+    ];
 
     export default examCenterCodes;

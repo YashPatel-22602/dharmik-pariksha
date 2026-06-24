@@ -96,6 +96,15 @@ module.exports = {
   sarangpipdi_navda: "055",
   ambaliya_ghed: "056",
   surat_prerana: "057",
-  surat_riveragreens: "058"
+  surat_riveragreens: "058",
+  surat_Kamrej: "059",
+  dhareshwar: "060",
+  kharghar: "061",
+  agatrai: "062",
+  bhuleshwar: "063",
+  botad: "064",
+  bhupgadh: "065",
+  gadhada: "066",
+  shankarpara: "067"
   };
   

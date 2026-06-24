@@ -597,6 +597,7 @@ Profile Information
 <p><strong>Name:</strong> {profile?.name}</p>
 <p><strong>LND ID:</strong> {profile?.lndId}</p>
 <p><strong>Mobile:</strong> {profile?.mobileNumber}</p>
+<p><strong>Exam Center:</strong> {profile?.examCenter}</p>
 
 </div>
 
@@ -637,7 +638,7 @@ Profile Information
 <p><strong>Name:</strong> {profile?.name}</p>
 <p><strong>Age:</strong> {profile?.age}</p>
 <p><strong>Gender:</strong> {profile?.gender}</p>
-
+<p><strong>Exam Center:</strong> {profile?.examCenter}</p>
 <select
   className="w-full p-2 rounded-lg border"
   value={level}
