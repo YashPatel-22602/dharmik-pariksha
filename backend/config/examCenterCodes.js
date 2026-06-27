@@ -97,7 +97,7 @@ module.exports = {
   ambaliya_ghed: "056",
   surat_prerana: "057",
   surat_riveragreens: "058",
-  surat_Kamrej: "059",
+  surat_kamrej: "059",
   dhareshwar: "060",
   kharghar: "061",
   agatrai: "062",
