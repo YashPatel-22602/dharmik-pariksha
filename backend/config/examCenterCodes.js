@@ -21,7 +21,6 @@ module.exports = {
   sankheda_khunvad: "019",
   sankheda_mankani: "019",
   sankheda_amalpur: "019",
-  chelana_barman: "020",
   chelana_khalsa_kanthariya_timbi: "020",
   chelana_kodi_kanthariya: "020",
   chelana_paati_mansa_timbi: "020",

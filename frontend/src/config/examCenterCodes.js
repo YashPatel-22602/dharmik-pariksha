@@ -21,7 +21,6 @@
     { "019": "Sankheda_Khunvad" },
     { "019": "Sankheda_Mankani" },
     { "019": "Sankheda_Amalpur" },
-    { "020": "Chelana_Barman" },
     { "020": "Chelana_Khalsa_Kanthariya_Timbi" },
     { "020": "Chelana_Kodi_Kanthariya" },
     { "020": "Chelana_Paati_Mansa_Timbi" },
