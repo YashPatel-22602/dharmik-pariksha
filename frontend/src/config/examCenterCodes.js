@@ -21,14 +21,6 @@
     { "019": "Sankheda_Khunvad" },
     { "019": "Sankheda_Mankani" },
     { "019": "Sankheda_Amalpur" },
-    { "020": "Chelana_Khalsa_Kanthariya_Timbi" },
-    { "020": "Chelana_Kodi_Kanthariya" },
-    { "020": "Chelana_Paati_Mansa_Timbi" },
-    { "020": "Chelana_Pichdi_Timbi" },
-    { "020": "Chelana_Hemad_Timbi" },
-    { "020": "Chelana_Juni_Katar_Timbi" },
-    { "020": "Chelana_Kagvadar_Timbi" },
-    { "020": "Chelana_Navi_Barpatodi_Timbi" },
     { "020": "Chelana_Timbi" },
     { "021": "Keshod" },
     { "022": "Navsari" },
@@ -104,7 +96,8 @@
     { "064": "Botad" },
     { "065": "Bhupgadh" },
     { "066": "Gadhada" },
-    { "067": "Shankarpara" }
+    { "067": "Shankarpara" },
+    { "068": "Kandivali" }
     ];
 
     export default examCenterCodes;

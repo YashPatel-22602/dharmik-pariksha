@@ -21,14 +21,6 @@ module.exports = {
   sankheda_khunvad: "019",
   sankheda_mankani: "019",
   sankheda_amalpur: "019",
-  chelana_khalsa_kanthariya_timbi: "020",
-  chelana_kodi_kanthariya: "020",
-  chelana_paati_mansa_timbi: "020",
-  chelana_pichdi_timbi: "020",
-  chelana_hemad_timbi: "020",
-  chelana_juni_katar_timbi: "020",
-  chelana_kagvadar_timbi: "020",
-  chelana_navi_barpatodi_timbi: "020",
   chelana_timbi: "020",
   keshod: "021",
   navsari: "022",
@@ -104,6 +96,7 @@ module.exports = {
   botad: "064",
   bhupgadh: "065",
   gadhada: "066",
-  shankarpara: "067"
+  shankarpara: "067",
+  kandivali: "068"
   };
   
