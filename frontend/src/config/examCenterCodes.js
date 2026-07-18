@@ -89,7 +89,9 @@
     { "065": "Bhupgadh" },
     { "066": "Gadhada" },
     { "067": "Shankarpara" },
-    { "068": "Kandivali" }
+    { "068": "Kandivali" },
+    { "069": "Savarkundla"}
+
     ];
 
     export default examCenterCodes;

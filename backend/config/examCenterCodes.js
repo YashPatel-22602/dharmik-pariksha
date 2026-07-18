@@ -89,6 +89,7 @@ module.exports = {
   bhupgadh: "065",
   gadhada: "066",
   shankarpara: "067",
-  kandivali: "068"
+  kandivali: "068",
+  savarkundla: "069"
   };
   
