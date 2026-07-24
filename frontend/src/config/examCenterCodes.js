@@ -90,7 +90,8 @@
     { "066": "Gadhada" },
     { "067": "Shankarpara" },
     { "068": "Kandivali" },
-    { "069": "Savarkundla"}
+    { "069": "Savarkundla"},
+    { "070": "Jetpur"}
 
     ];
 
