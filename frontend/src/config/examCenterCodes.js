@@ -91,7 +91,9 @@
     { "067": "Shankarpara" },
     { "068": "Kandivali" },
     { "069": "Savarkundla"},
-    { "070": "Jetpur"}
+    { "070": "Jetpur"},
+    { "071": "Palasva"},
+    { "072": "Bhadam"}
 
     ];
 
