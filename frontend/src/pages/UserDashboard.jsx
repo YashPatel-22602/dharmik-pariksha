@@ -22,8 +22,9 @@ const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 const [registeredLevel, setRegisteredLevel] = useState(null);
 const [wantExam, setWantExam] = useState(false);
 const [level, setLevel] = useState("Level 0");
-const [activeTab,setActiveTab] = useState("overview");
-const [profile,setProfile] = useState(null);
+const [activeTab, setActiveTab] = useState(
+  window.innerWidth < 1024 ? "certificates" : "overview"
+);const [profile,setProfile] = useState(null);
 const [results,setResults] = useState([]);
 const [levelData,setLevelData] = useState([]);
 const [genderData,setGenderData] = useState([]);
@@ -333,7 +334,7 @@ return(
       </h2>
 
       <nav className="flex flex-col gap-4">
-        {["overview","profile","exam registration","certificates"].map(tab => (
+        {["certificates","overview","profile","exam registration"].map(tab => (
           <button
             key={tab}
             onClick={() => {
@@ -685,7 +686,7 @@ onChange={(e)=>setWantExam(e.target.checked)}
 
 <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl">
 
-<h2 className="text-xl font-semibold mb-6 dark:text-white">
+<h2 className="text-xl font-semibold mb-6 dark:text-white px-4 py-2 rounded-lg">
 
 📜 Certificates
 
@@ -702,22 +703,23 @@ className="flex justify-between items-center p-4 border rounded-xl"
 
 <div>
 
-<p>
+    <p className="text-lg font-bold dark:text-white">
 
-<strong>Year:</strong>
+<strong>Year : </strong>
 
 {cert.examYear}
 
 </p>
 
-<p>
+    <p className="text-lg font-bold dark:text-white">
 
-<strong>Level:</strong>
+
+<strong>Level : </strong>
 
 {cert.examLevel}
 
 </p>
-
+<p></p>
 </div>
 
 <button
