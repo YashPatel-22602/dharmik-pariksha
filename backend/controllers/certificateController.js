@@ -7,7 +7,7 @@ const Registration = require("../models/Registration");
 
 const imagePath = path.join(
   __dirname,
-  "../assets/certificate-template.png"
+  "../assets/certificate_template_new.png"
 );
 
 const TEMPLATE_BYTES =
@@ -80,15 +80,15 @@ exports.downloadCertificate = async (req, res) => {
     const displayLevel =
       result.examLevel === "Basic"
         ? "Basic"
-        : `Level ${result.examLevel}`;
+        : ` ${result.examLevel}`;
 
     // ==========================
     // NAME
     // ==========================
 
     page.drawText(result.name || "", {
-      x: 260,
-      y: 600,
+      x: 290,
+      y: 580,
       size: 40,
       font
     });
@@ -99,8 +99,8 @@ exports.downloadCertificate = async (req, res) => {
 
 
     page.drawText(String(result.examYear), {
-  x: 900,
-  y: 1300,
+  x: 835,
+  y: 1320,
   size: 90,
   font,
   color: rgb(0.35, 0.15, 0.05)
@@ -109,8 +109,8 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       String(result.examYear),
       {
-        x: 902,
-        y: 1310,
+        x: 835,
+        y: 1320,
         size: 90,
         color: rgb(0.96, 0.76, 0.18), // Yellow
         font
@@ -124,8 +124,8 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       user?.examCenter || "",
       {
-        x: 240,
-        y: 500,
+        x: 310,
+        y: 480,
         size: 40,
         font
       }
@@ -139,7 +139,7 @@ exports.downloadCertificate = async (req, res) => {
       displayLevel,
       {
         x: 800,
-        y: 500,
+        y: 480,
         size: 40,
         font
       }
@@ -152,8 +152,8 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       String(result.marks || ""),
       {
-        x: 460,
-        y: 410,
+        x: 490,
+        y: 380,
         size: 40,
         font
       }
@@ -166,8 +166,8 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       "100",
       {
-        x: 870,
-        y: 415,
+        x: 910,
+        y: 380,
         size: 40,
         font
       }
@@ -180,8 +180,8 @@ exports.downloadCertificate = async (req, res) => {
     page.drawText(
       result.lndId || "",
       {
-        x: 260,
-        y: 315,
+        x: 290,
+        y: 280,
         size: 40,
         font
       }
