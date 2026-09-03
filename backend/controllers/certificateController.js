@@ -9,7 +9,10 @@ const {
 
 const User = require("../models/User");
 const Result = require("../models/Result");
-const Registration = require("../models/Registration");
+
+// ======================================================
+// FILE PATHS
+// ======================================================
 
 const imagePath = path.join(
   __dirname,
@@ -18,12 +21,19 @@ const imagePath = path.join(
 
 const TEMPLATE_BYTES = fs.readFileSync(imagePath);
 
+// Gujarati font
+const anekGujaratiFontPath = path.join(
+  __dirname,
+  "../node_modules/@fontsource/anek-gujarati/files/anek-gujarati-gujarati-700-normal.woff2"
+);
+
 
 // ======================================================
 // RENDER NAME AS PNG
 // ======================================================
 
 async function createNameImage(name) {
+
   const browser = await puppeteer.launch({
     headless: true,
     args: [
@@ -33,6 +43,7 @@ async function createNameImage(name) {
   });
 
   try {
+
     const page = await browser.newPage();
 
     await page.setViewport({
@@ -41,13 +52,48 @@ async function createNameImage(name) {
       deviceScaleFactor: 2
     });
 
+
+    // ==================================================
+    // LOAD FONT
+    // ==================================================
+
+    if (!fs.existsSync(anekGujaratiFontPath)) {
+      throw new Error(
+        `Gujarati font not found: ${anekGujaratiFontPath}`
+      );
+    }
+
+    const fontBase64 = fs
+      .readFileSync(anekGujaratiFontPath)
+      .toString("base64");
+
+
+    // ==================================================
+    // HTML
+    // ==================================================
+
     await page.setContent(`
       <!DOCTYPE html>
+
       <html>
+
         <head>
+
           <meta charset="UTF-8">
 
           <style>
+
+            @font-face {
+              font-family: "Anek Gujarati";
+
+              src: url("data:font/woff2;base64,${fontBase64}")
+                   format("woff2");
+
+              font-weight: 700;
+              font-style: normal;
+            }
+
+
             html,
             body {
               margin: 0;
@@ -55,42 +101,95 @@ async function createNameImage(name) {
               background: transparent;
             }
 
+
             .name {
+
               display: inline-block;
+
               white-space: nowrap;
-              font-family: Arial, sans-serif;
+
+              font-family:
+                "Anek Gujarati",
+                Arial,
+                sans-serif;
+
               font-size: 40px;
-              font-weight: bold;
+
+              font-weight: 700;
+
               color: black;
+
+              line-height: 1.2;
             }
+
           </style>
+
         </head>
 
+
         <body>
-          <div class="name">${escapeHtml(name)}</div>
+
+          <div class="name">
+            ${escapeHtml(name)}
+          </div>
+
         </body>
+
       </html>
     `);
+
+
+    // ==================================================
+    // WAIT FOR FONT
+    // ==================================================
 
     await page.evaluate(async () => {
       await document.fonts.ready;
     });
 
+
+    // Make sure our font actually loaded
+    const fontLoaded = await page.evaluate(() => {
+      return document.fonts.check(
+        '700 40px "Anek Gujarati"'
+      );
+    });
+
+    console.log(
+      "Anek Gujarati font loaded:",
+      fontLoaded
+    );
+
+
+    // ==================================================
+    // FIND NAME ELEMENT
+    // ==================================================
+
     const element = await page.$(".name");
 
     if (!element) {
-      throw new Error("Name element was not created");
+      throw new Error(
+        "Name element was not created"
+      );
     }
+
+
+    // ==================================================
+    // CREATE PNG
+    // ==================================================
 
     const image = await element.screenshot({
       type: "png",
       omitBackground: true
     });
 
+
     return image;
 
   } finally {
+
     await browser.close();
+
   }
 }
 
@@ -100,12 +199,14 @@ async function createNameImage(name) {
 // ======================================================
 
 function escapeHtml(value) {
+
   return String(value || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
 }
 
 
@@ -114,6 +215,7 @@ function escapeHtml(value) {
 // ======================================================
 
 exports.downloadCertificate = async (req, res) => {
+
   try {
 
     const year = Number(req.params.year);
@@ -130,10 +232,18 @@ exports.downloadCertificate = async (req, res) => {
 
 
     if (!result) {
+
       return res.status(404).json({
         message: "Certificate not found"
       });
+
     }
+
+
+    console.log(
+      "LATEST RESULT:",
+      result
+    );
 
 
     // ==================================================
@@ -151,12 +261,11 @@ exports.downloadCertificate = async (req, res) => {
 
 
     // ==================================================
-    // LOAD TEMPLATE
+    // CREATE PDF
     // ==================================================
 
-    const imageBytes = TEMPLATE_BYTES;
-
     const pdfDoc = await PDFDocument.create();
+
 
     const page = pdfDoc.addPage([
       1200,
@@ -168,25 +277,31 @@ exports.downloadCertificate = async (req, res) => {
     // ADD CERTIFICATE TEMPLATE
     // ==================================================
 
-    const pngImage = await pdfDoc.embedPng(
-      imageBytes
-    );
+    const pngImage =
+      await pdfDoc.embedPng(
+        TEMPLATE_BYTES
+      );
 
-    page.drawImage(pngImage, {
-      x: 0,
-      y: 0,
-      width: 1200,
-      height: 1600
-    });
+
+    page.drawImage(
+      pngImage,
+      {
+        x: 0,
+        y: 0,
+        width: 1200,
+        height: 1600
+      }
+    );
 
 
     // ==================================================
     // STANDARD FONT
     // ==================================================
 
-    const font = await pdfDoc.embedFont(
-      StandardFonts.HelveticaBold
-    );
+    const font =
+      await pdfDoc.embedFont(
+        StandardFonts.HelveticaBold
+      );
 
 
     // ==================================================
@@ -201,26 +316,31 @@ exports.downloadCertificate = async (req, res) => {
 
     // ==================================================
     // NAME
+    // Gujarati / English
+    // Rendered by Puppeteer as PNG
     // ==================================================
 
-    // IMPORTANT:
-    // Gujarati/Unicode name is rendered by Chromium,
-    // NOT by pdf-lib.
+    const nameImageBytes =
+      await createNameImage(
+        result.name || ""
+      );
 
-    const nameImageBytes = await createNameImage(
-      result.name || ""
+
+    const nameImage =
+      await pdfDoc.embedPng(
+        nameImageBytes
+      );
+
+
+    page.drawImage(
+      nameImage,
+      {
+        x: 290,
+        y: 580,
+        width: 400,
+        height: 50
+      }
     );
-
-    const nameImage = await pdfDoc.embedPng(
-      nameImageBytes
-    );
-
-    page.drawImage(nameImage, {
-      x: 290,
-      y: 580,
-      width: 400,
-      height: 50
-    });
 
 
     // ==================================================
@@ -274,7 +394,7 @@ exports.downloadCertificate = async (req, res) => {
 
 
     // ==================================================
-    // MARKS OBTAINED
+    // MARKS
     // ==================================================
 
     page.drawText(
@@ -322,7 +442,8 @@ exports.downloadCertificate = async (req, res) => {
     // SAVE PDF
     // ==================================================
 
-    const pdfBytes = await pdfDoc.save();
+    const pdfBytes =
+      await pdfDoc.save();
 
 
     // ==================================================
@@ -331,13 +452,15 @@ exports.downloadCertificate = async (req, res) => {
 
     res.setHeader(
       "Content-Type",
-      "application/pdf" 
+      "application/pdf"
     );
+
 
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=Certificate-${year}.pdf`
     );
+
 
     return res.send(
       Buffer.from(pdfBytes)
@@ -345,15 +468,40 @@ exports.downloadCertificate = async (req, res) => {
 
 
   } catch (err) {
-  console.error("=================================");
-  console.error("CERTIFICATE GENERATION FAILED");
-  console.error("MESSAGE:", err.message);
-  console.error("STACK:", err.stack);
-  console.error("=================================");
 
-  return res.status(500).json({
-    message: "Certificate generation failed",
-    error: err.message
-  });
-}
+    console.error(
+      "================================="
+    );
+
+    console.error(
+      "CERTIFICATE GENERATION FAILED"
+    );
+
+    console.error(
+      "MESSAGE:",
+      err.message
+    );
+
+    console.error(
+      "STACK:",
+      err.stack
+    );
+
+    console.error(
+      "================================="
+    );
+
+
+    return res.status(500).json({
+
+      message:
+        "Certificate generation failed",
+
+      error:
+        err.message
+
+    });
+
+  }
+
 };
