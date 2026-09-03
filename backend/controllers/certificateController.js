@@ -331,7 +331,7 @@ exports.downloadCertificate = async (req, res) => {
 
     res.setHeader(
       "Content-Type",
-      "application/pdf"
+      "application/pdf" 
     );
 
     res.setHeader(
