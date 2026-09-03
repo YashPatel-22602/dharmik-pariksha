@@ -1,6 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const { PDFDocument, StandardFonts,rgb } = require("pdf-lib");
+const puppeteer = require("puppeteer");
+const {
+  PDFDocument,
+  StandardFonts,
+  rgb
+} = require("pdf-lib");
+
 const User = require("../models/User");
 const Result = require("../models/Result");
 const Registration = require("../models/Registration");
@@ -10,28 +16,117 @@ const imagePath = path.join(
   "../assets/certificate_template_new.png"
 );
 
-const TEMPLATE_BYTES =
-  fs.readFileSync(imagePath);
+const TEMPLATE_BYTES = fs.readFileSync(imagePath);
+
+
+// ======================================================
+// RENDER NAME AS PNG
+// ======================================================
+
+async function createNameImage(name) {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ]
+  });
+
+  try {
+    const page = await browser.newPage();
+
+    await page.setViewport({
+      width: 1000,
+      height: 150,
+      deviceScaleFactor: 2
+    });
+
+    await page.setContent(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+
+          <style>
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+              background: transparent;
+            }
+
+            .name {
+              display: inline-block;
+              white-space: nowrap;
+              font-family: Arial, sans-serif;
+              font-size: 40px;
+              font-weight: bold;
+              color: black;
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="name">${escapeHtml(name)}</div>
+        </body>
+      </html>
+    `);
+
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+
+    const element = await page.$(".name");
+
+    if (!element) {
+      throw new Error("Name element was not created");
+    }
+
+    const image = await element.screenshot({
+      type: "png",
+      omitBackground: true
+    });
+
+    return image;
+
+  } finally {
+    await browser.close();
+  }
+}
+
+
+// ======================================================
+// ESCAPE HTML
+// ======================================================
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+// ======================================================
+// DOWNLOAD CERTIFICATE
+// ======================================================
 
 exports.downloadCertificate = async (req, res) => {
   try {
+
     const year = Number(req.params.year);
 
-    // ==========================
+
+    // ==================================================
     // FETCH RESULT
-    // ==========================
+    // ==================================================
 
-    const result = await Result.findOne(
-  {
-    lndId: req.user.lndId,
-    examYear: year
-  }
-).lean();
-
-    const user = await User.findOne(
-  { lndId: result.lndId },
-  { examCenter: 1 }
-).lean();
+    const result = await Result.findOne({
+      lndId: req.user.lndId,
+      examYear: year
+    }).lean();
 
 
     if (!result) {
@@ -40,27 +135,42 @@ exports.downloadCertificate = async (req, res) => {
       });
     }
 
-    // ==========================
-    // FETCH REGISTRATION
-    // ==========================
+
+    // ==================================================
+    // FETCH USER
+    // ==================================================
+
+    const user = await User.findOne(
+      {
+        lndId: result.lndId
+      },
+      {
+        examCenter: 1
+      }
+    ).lean();
 
 
-    // ==========================
+    // ==================================================
     // LOAD TEMPLATE
-    // ==========================
-
-    const imagePath = path.join(
-      __dirname,
-      "../assets/certificate-template.png"
-    );
+    // ==================================================
 
     const imageBytes = TEMPLATE_BYTES;
 
     const pdfDoc = await PDFDocument.create();
 
-    const page = pdfDoc.addPage([1200, 1600]);
+    const page = pdfDoc.addPage([
+      1200,
+      1600
+    ]);
 
-    const pngImage = await pdfDoc.embedPng(imageBytes);
+
+    // ==================================================
+    // ADD CERTIFICATE TEMPLATE
+    // ==================================================
+
+    const pngImage = await pdfDoc.embedPng(
+      imageBytes
+    );
 
     page.drawImage(pngImage, {
       x: 0,
@@ -69,42 +179,53 @@ exports.downloadCertificate = async (req, res) => {
       height: 1600
     });
 
+
+    // ==================================================
+    // STANDARD FONT
+    // ==================================================
+
     const font = await pdfDoc.embedFont(
       StandardFonts.HelveticaBold
     );
 
-    // ==========================
+
+    // ==================================================
     // FORMAT LEVEL
-    // ==========================
+    // ==================================================
 
     const displayLevel =
       result.examLevel === "Basic"
         ? "Basic"
         : ` ${result.examLevel}`;
 
-    // ==========================
-    // NAME
-    // ==========================
 
-    page.drawText(result.name || "", {
+    // ==================================================
+    // NAME
+    // ==================================================
+
+    // IMPORTANT:
+    // Gujarati/Unicode name is rendered by Chromium,
+    // NOT by pdf-lib.
+
+    const nameImageBytes = await createNameImage(
+      result.name || ""
+    );
+
+    const nameImage = await pdfDoc.embedPng(
+      nameImageBytes
+    );
+
+    page.drawImage(nameImage, {
       x: 290,
       y: 580,
-      size: 40,
-      font
+      width: 400,
+      height: 50
     });
 
-    // ==========================
+
+    // ==================================================
     // YEAR
-    // ==========================
-
-
-    page.drawText(String(result.examYear), {
-  x: 835,
-  y: 1320,
-  size: 90,
-  font,
-  color: rgb(0.35, 0.15, 0.05)
-});
+    // ==================================================
 
     page.drawText(
       String(result.examYear),
@@ -112,14 +233,19 @@ exports.downloadCertificate = async (req, res) => {
         x: 835,
         y: 1320,
         size: 90,
-        color: rgb(0.96, 0.76, 0.18), // Yellow
-        font
+        font,
+        color: rgb(
+          0.96,
+          0.76,
+          0.18
+        )
       }
     );
 
-    // ==========================
+
+    // ==================================================
     // EXAM CENTER
-    // ==========================
+    // ==================================================
 
     page.drawText(
       user?.examCenter || "",
@@ -131,9 +257,10 @@ exports.downloadCertificate = async (req, res) => {
       }
     );
 
-    // ==========================
+
+    // ==================================================
     // LEVEL
-    // ==========================
+    // ==================================================
 
     page.drawText(
       displayLevel,
@@ -145,9 +272,10 @@ exports.downloadCertificate = async (req, res) => {
       }
     );
 
-    // ==========================
+
+    // ==================================================
     // MARKS OBTAINED
-    // ==========================
+    // ==================================================
 
     page.drawText(
       String(result.marks || ""),
@@ -159,9 +287,10 @@ exports.downloadCertificate = async (req, res) => {
       }
     );
 
-    // ==========================
+
+    // ==================================================
     // TOTAL MARKS
-    // ==========================
+    // ==================================================
 
     page.drawText(
       "100",
@@ -173,9 +302,10 @@ exports.downloadCertificate = async (req, res) => {
       }
     );
 
-    // ==========================
+
+    // ==================================================
     // LND ID
-    // ==========================
+    // ==================================================
 
     page.drawText(
       result.lndId || "",
@@ -187,11 +317,17 @@ exports.downloadCertificate = async (req, res) => {
       }
     );
 
-    // ==========================
+
+    // ==================================================
     // SAVE PDF
-    // ==========================
+    // ==================================================
 
     const pdfBytes = await pdfDoc.save();
+
+
+    // ==================================================
+    // RESPONSE
+    // ==================================================
 
     res.setHeader(
       "Content-Type",
@@ -207,16 +343,17 @@ exports.downloadCertificate = async (req, res) => {
       Buffer.from(pdfBytes)
     );
 
+
   } catch (err) {
+  console.error("=================================");
+  console.error("CERTIFICATE GENERATION FAILED");
+  console.error("MESSAGE:", err.message);
+  console.error("STACK:", err.stack);
+  console.error("=================================");
 
-    console.error(
-      "CERTIFICATE ERROR:",
-      err
-    );
-
-    return res.status(500).json({
-      message: "Certificate generation failed"
-    });
-
-  }
+  return res.status(500).json({
+    message: "Certificate generation failed",
+    error: err.message
+  });
+}
 };
