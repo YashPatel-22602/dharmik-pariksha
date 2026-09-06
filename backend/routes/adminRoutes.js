@@ -36,6 +36,10 @@ router.get(
   getAnalytics
 );
 
-module.exports = router;
+const { downloadCenterCertificates } = require("../controllers/certificateController");
 
+router.get("/download-center-certificates/:year/:center", authMiddleware, downloadCenterCertificates);
+
+const { downloadAllCertificates } = require("../controllers/certificateController");
+router.get("/download-all-certificates/:year", authMiddleware, downloadAllCertificates);
 module.exports = router;

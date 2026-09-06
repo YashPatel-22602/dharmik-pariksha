@@ -105,69 +105,35 @@
   };
 
 const downloadCertificate = async (year) => {
-
   try {
-
     setCertificateLoading(true);
 
-    const response = await API.get(
-      `/certificate/${year}`,
-      {
-        responseType: "blob"
-      }
-    );
+    // Force React to paint the loader UI before processing the download
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Create PNG blob
-    const blob = new Blob(
-      [response.data],
-      {
-        type: "image/png"
-      }
-    );
+    const response = await API.get(`/certificate/${year}`, {
+      responseType: "blob"
+    });
 
-    // Create temporary download URL
-    const url =
-      window.URL.createObjectURL(blob);
-
-    // Create download link
-    const link =
-      document.createElement("a");
-
+    const blob = new Blob([response.data], { type: "image/png" });
+    const url = window.URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
     link.href = url;
-
-    // Download as PNG
-    link.download =
-      `Certificate-${year}.png`;
-
+    link.download = `Certificate-${year}.png`;
+    
     document.body.appendChild(link);
-
     link.click();
-
-    // Remove link
     link.remove();
-
-    // Clean up memory
     window.URL.revokeObjectURL(url);
 
   } catch (err) {
-
-    console.error(
-      "Certificate download error:",
-      err
-    );
-
-    alert(
-      "Certificate download failed"
-    );
-
+    console.error("Certificate download error:", err);
+    alert("Certificate download failed");
   } finally {
-
     setCertificateLoading(false);
-
   }
-
 };
-
 
   const logout = () => {
   localStorage.removeItem("token");
@@ -261,9 +227,15 @@ const downloadCertificate = async (year) => {
   if(loading){
   return(
     <>
+   <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-all duration-500">
+    
+    {/* Add this line right here! */}
     {certificateLoading && <Loader />}
-  <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
+
+  {/* ✅ DESKTOP SIDEBAR */}
+  <div className="hidden lg:flex w-64 bg-white/70 dark:bg-gray-800 backdrop-blur-xl shadow-2xl p-6 flex-col justify-between">
     <Loader />
+  </div>
   </div>
   </>
   );
@@ -290,18 +262,23 @@ const downloadCertificate = async (year) => {
 
   /* ================= UI ================= */
 
+  /* ================= UI ================= */
+
   return(
+  <>
+    {/* 1. Loader is now placed correctly in the active DOM */}
+    {certificateLoading && <Loader />}
 
-  <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-all duration-500">
+    {/* 2. Main Dashboard Wrapper */}
+    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-all duration-500">
 
-  {/* ✅ DESKTOP SIDEBAR */}
-  <div className="hidden lg:flex w-64 bg-white/70 dark:bg-gray-800 backdrop-blur-xl shadow-2xl p-6 flex-col justify-between">
-
-    <div>
-
-      <h2 className="text-2xl font-bold text-indigo-600 dark:text-white mb-10">
-        Dashboard
-      </h2>
+      {/* ✅ DESKTOP SIDEBAR */}
+      <div className="hidden lg:flex w-64 bg-white/70 dark:bg-gray-800 backdrop-blur-xl shadow-2xl p-6 flex-col justify-between">
+        
+        <div>
+          <h2 className="text-2xl font-bold text-indigo-600 dark:text-white mb-10">
+            Dashboard
+          </h2>
 
       <nav className="flex flex-col gap-4">
 
@@ -766,7 +743,7 @@ const downloadCertificate = async (year) => {
   </div>
 
   </div>
-
+</>
   );
 
   }

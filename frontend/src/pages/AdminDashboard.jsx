@@ -15,7 +15,6 @@ import {
   CartesianGrid
 } from "recharts";
 
-
 const AdminDashboard = () => {
 
 const COLORS = [
@@ -32,6 +31,11 @@ const COLORS = [
   const [analytics, setAnalytics] = useState(null);
   const [selectedYear, setSelectedYear] = useState("");
 const [selectedLevel, setSelectedLevel] = useState("");
+const [certCenter, setCertCenter] = useState("");
+const [certYearZip, setCertYearZip] = useState("");
+const [isDownloading, setIsDownloading] = useState(false)
+const [certYearAll, setCertYearAll] = useState("");
+const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const handleLogout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
@@ -137,6 +141,70 @@ const [selectedLevel, setSelectedLevel] = useState("");
     }
   };
 
+  const downloadCenterCertificatesZip = async (e) => {
+    e.preventDefault();
+    if (!certCenter || !certYearZip) return alert("Select Year and Center");
+    
+    setIsDownloading(true);
+    setMessage("Generating ZIP... This may take a moment.");
+    
+    try {
+      const response = await fetch(
+        `https://dharmik-pariksha.onrender.com/api/admin/download-center-certificates/${certYearZip}/${certCenter}`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      
+      if (!response.ok) throw new Error("No certificates found");
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${certCenter}-Certificates-${certYearZip}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setMessage("Download complete!");
+    } catch (error) {
+      console.error("Zip Error", error);
+      setMessage("Failed to download certificates: " + error.message);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const downloadAllCertificatesZip = async (e) => {
+  e.preventDefault();
+  if (!certYearAll) return alert("Select Year");
+
+  setIsDownloadingAll(true);
+  setMessage("Generating Master ZIP... This might take a few minutes depending on user count.");
+
+  try {
+    const response = await fetch(
+      `https://dharmik-pariksha.onrender.com/api/admin/download-all-certificates/${certYearAll}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+    );
+
+    if (!response.ok) throw new Error("No certificates found for this year");
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `All-Centers-Certificates-${certYearAll}.zip`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setMessage("Master Download complete!");
+  } catch (error) {
+    console.error("Zip Error", error);
+    setMessage("Failed to download master zip: " + error.message);
+  } finally {
+    setIsDownloadingAll(false);
+  }
+};
+
 const downloadZip1 = async () => {
     try {
       const response = await fetch(
@@ -219,6 +287,10 @@ const downloadZip1 = async () => {
 
   <button onClick={downloadZip1} style={styles.menuBtn}>
     Exam Registrations User ZIP
+  </button>
+
+<button style={styles.menuBtn} onClick={() => setActiveTab("certificates")}>
+    Bulk Certificate Download
   </button>
 
   <button
@@ -343,7 +415,54 @@ onClick={async () => {
   </div>
 )}
 
+{activeTab === "certificates" && (
+  <div style={styles.card}>
+    <h2>Download Center Certificates</h2>
+    <form onSubmit={downloadCenterCertificatesZip} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' }}>
+      <input 
+        type="text" 
+        placeholder="Enter Center Name (e.g. Bhadam)" 
+        value={certCenter} 
+        onChange={(e) => setCertCenter(e.target.value)} 
+        style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }} 
+        required 
+      />
+      <input 
+        type="number" 
+        placeholder="Enter Year (e.g. 2026)" 
+        value={certYearZip} 
+        onChange={(e) => setCertYearZip(e.target.value)} 
+        style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }} 
+        required 
+      />
+      <button style={styles.button} disabled={isDownloading}>
+        {isDownloading ? "Zipping..." : "Download ZIP"}
+      </button>
+    </form>
 
+    <div style={{ marginTop: '40px', borderTop: '2px solid #E5E7EB', paddingTop: '20px' }}>
+  <h2>Download ALL Centers (Master ZIP)</h2>
+  <p style={{ color: '#6B7280', marginBottom: '15px' }}>
+    Downloads every certificate for the year, automatically organized into folders by center name.
+  </p>
+  <form onSubmit={downloadAllCertificatesZip} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+    <input 
+      type="number" 
+      placeholder="Enter Year (e.g. 2026)" 
+      value={certYearAll} 
+      onChange={(e) => setCertYearAll(e.target.value)} 
+      style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }} 
+      required 
+    />
+    <button style={{...styles.button, background: '#10B981'}} disabled={isDownloadingAll}>
+      {isDownloadingAll ? "Zipping All Certificates..." : "Download Master ZIP"}
+    </button>
+  </form>
+</div>
+  </div>
+
+  
+)}
 
 {/* LEVEL WISE PIE CHART */}
 {activeTab === "analytics" && analytics && (
